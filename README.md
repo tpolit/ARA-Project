@@ -1,8 +1,10 @@
 # ARA-Project
+
 Réalisation d'une étude expérimentale d'algorithmes répartis grâce au simulateur PeerSim.
 
-Objectifs : 
-  Le but de ce projet est de faire une étude expérimentale à travers le simulateur Peer-
+## Objectifs : 
+
+Le but de ce projet est de faire une étude expérimentale à travers le simulateur Peer-
 Sim. Dans un premier temps, nous étudierons dans un environnement fiable une applica-
 tion fictive qui se base sur un protocole de verrouillage distribué. Dans un second temps,
 nous exécuterons cette application dans un environnement non fiable (un nœud peut tom-
