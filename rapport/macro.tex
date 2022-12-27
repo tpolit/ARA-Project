@@ -1,0 +1,36 @@
+% !TEX encoding = UTF-8 Unicode
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\gddessin}[1]{
+\begin{center}
+\includegraphics[scale=0.1]{#1}
+\end{center}
+}
+\newcommand{\ptdessin}[1]{
+\begin{center}
+\includegraphics[scale=0.8]{#1}
+\end{center}
+}
+\newcommand{\courbe}[1]{
+\begin{center}
+\includegraphics[scale=0.7]{#1}
+\end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%
+
+\newenvironment{data}
+	       {\list{}{ %\labelwidth \itemindent-\leftmargin
+			\let\makelabel\datalabel}}
+	       {\endlist}
+
+\newcommand*{\datalabel}[1]{\hspace\labelsep
+				\makebox[1.in][l]{ 
+				{ #1}} }
+
+	\def\LigneVert#1{ \vbox { \noindent \leftskip 10 mm
+	  \vrule
+	  \vbox { \hsize 16.6 cm \noindent \leftskip 5 mm
+	  #1 }}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%% FIN MACRO

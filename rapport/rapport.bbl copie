@@ -1,0 +1,41 @@
+\begin{thebibliography}{1}
+
+\bibitem{kordon}
+Fabrice Kordon.
+\newblock Cha{\^\i}ne youtube de fabrice kordon.
+\newblock https://www.youtube.com/c/FabriceKordon.
+
+\bibitem{avfoundation}
+Apple.
+\newblock Avfoundation.
+\newblock https://developer.apple.com/av-foundation/.
+
+\bibitem{xcode}
+Apple.
+\newblock Xcode, user manual.
+\newblock https://developer.apple.com/documentation/xcode.
+
+\bibitem{swiftdev}
+TheSwiftDev.
+\newblock How to use c libraries in swift?
+\newblock https://theswiftdev.com/how-to-use-a-swift-library-in-c/.
+
+\bibitem{parallele}
+Parall{\'e}lisation.
+\newblock https://fr.wikipedia.org/wiki/Parall{\'e}lisme\_(informatique).
+
+\bibitem{A8X}
+Puce a8x.
+\newblock https://fr.wikipedia.org/wiki/Apple\_A8X.
+
+\bibitem{M1}
+Asif Shaik.
+\newblock Puce m1.
+\newblock https://www.iphonehacks.com/2020/11/apple-m1-performance.html.
+
+\bibitem{M1bis}
+Apple.
+\newblock Puce m1.
+\newblock https://www.apple.com/fr/ipad-pro/specs/.
+
+\end{thebibliography}

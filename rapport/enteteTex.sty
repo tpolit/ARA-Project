@@ -1,0 +1,358 @@
+% !TEX encoding = UTF-8 Unicode
+% PB : il ne trouve pas  :
+% fancybox et multirow
+% SOLUTION : ajouter fancybox.sty dans le rep ; commenter multirow
+
+% =====================================================================
+%    Style de papier pour Cours ou Examen UFR SITEC
+%    ----------------------------------------------------------------------------
+%
+%    Francois LOUF / modif O. Polit
+%
+%    Date de cration        : 03/09/2003
+%    Date de modification : 03/09/2006
+% =====================================================================
+
+% ------------------------------------------------> Initialisation <---
+
+% Utilisable uniquement avec LaTeX 2e
+\NeedsTeXFormat{LaTeX2e}
+
+% Nom du style
+\ProvidesPackage{enteteTex}
+
+% Affichage
+\typeout{}
+\typeout{Style LaTeX pour Cours et Examen UFR SITEC}
+\typeout{}
+% -----------------------------------------> Codage des caractres <---
+
+\usepackage[utf8]{inputenc}
+
+\usepackage[T1]{fontenc} 
+\usepackage[french]{babel}
+
+% -----------------------------------------------> Packages divers <---
+
+\usepackage{amsmath,amssymb}   % Pour tendre les fonctions maths
+ \usepackage{fancybox}          % Pour faire de jolies botes
+\usepackage{euscript}          % Pour faire de jolies lettres
+\usepackage{calc}              % Pour faire des calculs
+\usepackage{ifthen}        % Pour les tests
+
+
+%%%%%%%%%%%%%%%%%%%%%% DEBUT MACRO
+
+% Logo et Figures
+\newcommand{\logo}[1]
+{\includegraphics [totalheight=2.5cm]
+{#1}
+}
+
+\newcommand{\logoBig}[1]
+{\includegraphics [totalheight=3.5cm]
+{#1}
+}
+
+\newcommand{\dessin}[1]
+{
+\begin{center}
+\includegraphics[width=.5\textwidth]{#1}
+\end{center}
+}
+
+\newcommand{\Gddessin}[1]
+{
+\begin{center}
+\includegraphics[width=\textwidth]{#1}
+\end{center}
+}
+
+%%%%%%%%%%%%%
+% newcommand
+\newcommand{\eq}[1]{Eq. (\ref{eq:#1})}
+\newcommand{\fig}[1]{Fig. \ref{fig:#1}}
+\newcommand{\tab}[1]{Tab. \ref{tab:#1}}
+\renewcommand{\sec}[1]{Sec. \ref{sec:#1}}
+
+
+\newcommand{\vbasei}{\vec \imath }
+\newcommand{\vbasej}{\vec \jmath }
+
+\newcommand{\ptesp}{\vspace*{0.4cm}}
+\newcommand{\gdesp}{\vspace*{1.cm}}
+\newcommand{\Gdesp}{\vspace*{2.cm}}
+\newcommand{\e}{\;}
+
+
+\newcommand{\ol}[1]{\displaystyle {\overline{#1}}}
+\newcommand{\calp}[1]{\displaystyle {\cal P}_{#1}}
+\newcommand{\mat}[1]{\displaystyle \left[ #1 \right]}
+\newcommand{\mzero}{\left[ 0 \right]}
+\newcommand{\dint}{\displaystyle \int}
+\newcommand{\norme}[1]{\parallel #1 \parallel}
+\newcommand{\abs}[1]{\mid #1 \mid}
+\def\exp{\mathop{\rm e}\nolimits}
+\def\cotg{\mathop{\rm cotg}}
+\renewcommand{\angle}[1]{#1^{\circ}}
+
+\def\sinh{\mathop{\rm sh}}
+\def\cosh{\mathop{\rm ch}}
+
+\let\vect=\overrightarrow
+\let\dis=\displaystyle
+
+%\def\LigneVert#1{ \vbox { \noindent \leftskip 5 mm
+%	                  \vrule
+%	          \vbox { \hsize 15 cm \noindent \leftskip 5 mm
+%		  #1 }}}
+
+%% newVersion
+\def\LigneVert#1{ \vspace*{0.2cm} 
+               \vbox { 
+                     \noindent \leftskip -5 mm
+	                  \vrule
+	          \vbox { \hsize 15 cm \noindent \leftskip 5 mm
+		  #1 }}}
+%%%%%%%%%%%%%%%%%%%%%% FIN MACRO
+% 
+% 
+% 
+% 
+% --------------------------------------------> Rglages de marges <---
+
+%%% dvi
+       \textheight=23.2cm
+ 	\topmargin=0cm
+%%% pdf
+%       \textheight=24.7cm
+ % 	\topmargin= -1.5cm
+
+	\textwidth=16cm
+	 \oddsidemargin=0cm
+	 \evensidemargin=0cm
+
+% Largeur du texte
+% \setlength{\textwidth}{450.pt}
+% \setlength{\hoffset}{-50pt}
+
+% Zone de marge
+% \setlength{\marginparwidth}{0. pt}
+
+% Marge haute sur la page
+% \setlength{\topmargin}{0.pt}
+
+% Entte
+% \setlength{\headheight}{0. mm}
+% \setlength{\headsep}{11. mm}
+
+% Hauteur du texte
+% \setlength{\textheight}{750pt}
+% \setlength{\voffset}{-70pt}
+
+
+% --------------------------------------> Rglages des paragraphes <---
+
+% Indentation
+\setlength{\parindent}{0. cm}
+
+% Espace inter paragraphe
+\setlength{\parskip}{0. cm}
+
+% --------------------------------------> Rglages de l'interligne <---
+
+\def\baselinestretch{1.2}
+
+% --------------------------------------------------------> Entte <---
+
+\newcommand{\entete}[6]{
+
+  \begin{center}
+
+% Pas de numro sur la premire page
+    \thispagestyle{empty}  
+  
+% Logo
+    \vskip 30.pt  
+% \logo{logo-LMpX.eps}
+\logo{./figures/lip6.png}
+\hfill \logo{./figures/su.png}
+\hfill \logo{./figures/cnrs.png}
+    \vskip 30.pt  
+% Titre
+    {\LARGE {\bf #1}}
+     \vskip 1.5 em
+% Sous-titre    
+    {\large {\bf #2}}
+    \vskip 1.5 em
+% Auteur    
+    {\large {\bf #3}}
+    \vskip 1.5 em
+    
+% Dure
+    \ifthenelse{\equal{#4}{}}{}{\large{\bf Dure : #4}}
+
+% Date
+    #5
+    
+    \vskip 30.pt   
+
+% petite ligne fine pour separateur    
+    \hrulefill
+    
+% Topo descriptif
+    \textit{#6}
+
+% petite ligne fine pour separateur    
+    \hrulefill
+
+% Le document commence sur une nouvelle page    
+%     \newpage 
+
+\end{center}
+ 
+}
+
+% -------------------------------> Configuration des footer/header <---
+
+\usepackage{fancyhdr}
+
+\def\titrecourt#1#2#3{
+\fancyhf{}
+\fancyhead[RE,LO]{\textsc{#1} #2}
+\fancyfoot[LE,RO]{\thepage}
+\fancyhead[RO]{\nouppercase{\rightmark}}
+\fancyhead[LE]{\nouppercase{\leftmark}}
+
+\fancyfoot[RE, LO]{#3}
+
+% Redfinition de l'paisseur des rgles
+\renewcommand{\headrulewidth}{.5pt}
+\renewcommand{\footrulewidth}{.5pt}
+}
+
+% ----------------------------------------------------------> Saut <---
+
+\def\saut{
+  \vskip 30pt
+}
+
+% --------------------------------------------------------> Figures <---
+% Placement des figures et tables
+% \usepackage{here}
+
+% Affichage des images EPS
+\usepackage{graphicx}
+
+
+% Emplacement des figures et des logo
+\graphicspath{{./figures/}}
+% Pour ajouter du texte dans les figures
+\usepackage{psfrag}
+
+%Pour noter les figures Figure et pas Fig.
+% \renewcommand\figurename{Figure}
+
+% ------------------------------------------------------> Tableaux <---
+
+% Pour crire sur plusieurs colonnes
+\usepackage{multicol}
+
+% ------------------------------------------------------> Tableaux <---
+ 
+%  \usepackage{multirow}
+%  \renewcommand{\multirowsetup}{\centering}
+
+% ---------------------------------------------------> Remarques <---
+
+\newcommand{\remark}[1]{
+    {
+    \setlength{\parskip}{10pt}%
+    \par\noindent\textit{\textbf{Remarque}}.\ --\ \textit{#1}
+    }
+}
+
+% ----------------------------------------------------> Dfinitions <---
+
+\newcommand{\definition}[1]{
+    {
+    \setlength{\parskip}{10pt}%
+     \par\noindent\textbf{Dfinition}.\ --\ #1
+    }
+}
+    
+% ----------------------------------------------------> Dfinitions <---
+
+\newcommand{\theo}[1]{
+    {
+    \setlength{\parskip}{10pt}%
+     \par\noindent\textbf{Thorme}.\ --\ #1
+    }
+}
+    
+% ----------------------------------------------------> Exercices <---
+\newcommand{\Ex}[1]
+{
+    {
+    \setlength{\parskip}{10pt}%
+    \par \noindent \textit{Exercice } : \e #1
+    }
+}
+
+
+% ----------------------------------------------------> Exemples <---
+\newcommand{\Exem}
+{
+    {
+    \setlength{\parskip}{10pt}%
+    \par \noindent \textit{Exemples} : \e 
+    }
+}
+
+% ----------------------------------------------------> Proprits <---
+\newcommand{\prop}
+{
+    {
+    \setlength{\parskip}{10pt}%
+    \par \noindent \textit{Proprits} : \e 
+    }
+}
+
+
+% ----------------------------------------------------> Correction <---
+\newcommand{\CoEx}[1]
+{
+    {
+    \setlength{\parskip}{10pt}%
+    \par \noindent \LigneVert{\textit{Correction }  : \e #1 }
+    }
+}
+
+\newcommand{\Co}[1]
+{
+    {
+    \setlength{\parskip}{10pt}%
+    \par \noindent \LigneVert{ #1 }
+    }
+}
+% prsence ou non de la correction pour l'impression : A MEDITER
+% \ifthenelse{\equal{#4}{}}{}{\large{\bf Dure : #4}}
+
+% ----------------------------------------------------> HyperTeX <---
+\usepackage{hyperref} % Crer des liens et des signets 
+\hypersetup{	
+colorlinks=true, %colorise les liens 
+breaklinks=true, %permet le retour  la ligne dans les liens trop longs 
+urlcolor= blue, %couleur des hyperliens 
+linkcolor= blue,	%couleur des liens internes 
+citecolor=black,	%couleur des rfrences 
+pdftitle={ }, %informations apparaissant dans 
+pdfauthor={O. Polit}, %les informations du document 
+pdfsubject={ }	%sous Acrobat. 
+} 
+
+
+% ----------------------------------------------------> Marges <---
+%\addtolength{\textwidth}{2cm} % Marges moins larges 
+%\addtolength{\oddsidemargin}{-1cm}	% Recentrage 
+

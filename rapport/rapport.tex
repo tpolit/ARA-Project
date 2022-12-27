@@ -1,0 +1,107 @@
+% !TEX encoding = UTF-8 Unicode
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{./enteteTex}
+\usepackage[section]{placeins}
+\pagestyle{fancy}
+\usepackage{color}
+
+% Placement des figures et tables
+\usepackage{here}
+% Michele:
+\usepackage{subfig}
+\usepackage{tabularx}
+
+\usepackage{cancel}
+\renewcommand{\CancelColor}{\color{blue}}
+\setlength{\parindent}{1cm}
+%
+
+% -------------------------------------------------------> Debut du document <---
+\begin{document}
+% ===============================================================================
+% Définition de l'entête avec 6 arguments : 
+% Titre -- Sous Titre -- Auteur -- Durée (si examen) -- Date (idem) -- Topo
+\entete{Rapport projet ARA}
+{}
+{Titouan Polit}
+{}
+{\today}
+{Ce projet a pour but de réaliser une étude expérimentale à travers le simulateur Peer-Sim.}
+
+% Définition d'un titre court pour le bas de page
+\titrecourt{Projet SAR 2022}{}{T. Polit, L. Falguerolle, F. Jebari}
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\author{Titouan Polit, Louis Falguerolle, Firas Jebari}
+% \date{1999 --- 2000}
+%%%%%%%%%%%%%%%%%%%%%% FIN MACRO
+
+\input{macro.tex}
+
+% \includeonly{racines}
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+%\newpage
+\vspace*{-0.5cm}
+%\listoffigures
+%\listoftables
+
+\newpage
+
+
+
+\section{Introduction}
+
+
+%------------------------------------------------
+
+\section{Caractéristiques techniques}
+
+
+%------------------------------------------------
+
+\section{Récupération du flux vidéo}
+
+%------------------------------------------------
+
+\section{Ecran de l'iPad}
+
+
+%------------------------------------------------
+
+\section{Linkage C/C++ Swift}
+
+
+%------------------------------------------------
+
+\section{Traitement Mono-Threadé}
+
+
+%------------------------------------------------
+
+\section{Traitement Multi-Threadé}
+
+%----------------------------------------------------------------------------------------
+
+\section{Traitement GPU}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[]{Ressources/images/Comparaison CPU-GPU.jpg}
+    \caption{Comparaison CPU/GPU}
+    \label{fig:cpu/gpu}
+\end{figure}
+
+\section{Conclusion}
+
+\newpage
+\section{Bibliographie}
+
+\bibliography{biblio}
+\bibliographystyle{unsrt}
+
+\end{document}
