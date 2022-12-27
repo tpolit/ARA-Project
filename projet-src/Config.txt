@@ -1,0 +1,24 @@
+network.size 10
+simulation.experiment 1
+simulation.endtime 10000
+random.seed 20
+
+protocol.transport UniformRandomTransport
+protocol.transport.mindelay 1 # gamma
+protocol.transport.maxdelay 1
+
+protocol.fifotransport FIFOTransport
+protocol.fifotransport.transport transport
+
+protocol.naimitrehel NaimiTrehelAlgo
+protocol.naimitrehel.transport fifotransport
+protocol.naimitrehel.timeCS 100 #alpha
+protocol.naimitrehel.timeBetweenCS 80 #beta
+
+init.i Initialisateur
+init.i.algo naimitrehel
+
+control.end TheEnd
+control.end.at -1
+control.end.FINAL
+control.end.algo naimitrehel
