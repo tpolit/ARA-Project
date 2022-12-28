@@ -28,6 +28,9 @@ tutoriel/
 # metadata
 .metadata/
 
+# eclipse
+/project-src/.classpath
+
 # APPLE
 .DS_STORE
 

@@ -44,11 +44,11 @@ public class NaimiTrehelAlgo implements EDProtocol {
 	// variables d'état de l'application
 	protected State state;
 	protected Queue<Long> next;
-	protected long last;
-	protected int nb_cs = 0;// permet de compter le nombre de section critiques
-							// exécutées par le noeud
+	protected long last; // le father d'AR
 	protected int req_counter = 0;
 	protected int tok_counter = 0;
+	protected int nb_cs = 0;// permet de compter le nombre de section critiques
+							// exécutées par le noeud
 	protected int global_counter = 0; // compteur qui sera inclu dans le message
 										// jeton, sa valeur est égale à la
 										// dernière valeur connue
@@ -213,6 +213,7 @@ public class NaimiTrehelAlgo implements EDProtocol {
 			Node dest = Network.get((int) last);
 			tr.send(host, dest, new RequestMessage(host.getID(), dest.getID(),
 					protocol_id, requester), protocol_id);
+			this.req_counter++;
 			last = requester;
 		}
 	}
@@ -267,7 +268,41 @@ public class NaimiTrehelAlgo implements EDProtocol {
 	
 	////////////////////////////////////////// TO MOVE TO A SUBCLASS ////////////////////////////////////////////////////
 	public String getInfoEnd() {
-		return "RequestMsg :"+this.req_counter+", TokenMsg:"+this.tok_counter;
+		String messagesCounter = "RequestMsg :"+this.req_counter+", TokenMsg:"+this.tok_counter;
+		//String alphaInfo = "Nombre de CS entrées: "+this.nb_cs+", pour un total de: "+alphaTotal+".";
+		//String betaInfo = "Temps passé à attendre de mon plein grés (attention, au max un beta n'est pas inclus): "+betaPseudoTotal+".";
+		String waitInfo = "Temps passé en requestion (approx à cause de beta et du temps total): "+(this.getWaitingTime())+".";
+		
+		//return messagesCounter+"\n\t\t"+alphaInfo+"\n\t\t"+betaInfo+"\n\t\t"+waitInfo;
+		return messagesCounter+"\n\t\t"+waitInfo;
+	}
+	
+	public static String getPerStateTimeInfo(long nb_cs_total, long totalTime) {
+		Double[] info = NaimiTrehelAlgo.getPerStateTime(nb_cs_total, totalTime);
+		return "U: "+info[0]+"%, "+"T: "+info[1]+"%, "+"N: "+info[2]+"%.";
+	}
+	
+	public Long getWaitingTime() {
+		long betaPseudoTotal = this.nb_cs*this.timeBetweenCS;
+		long alphaTotal = this.nb_cs*this.timeCS;
+		long totalTime = CommonState.getTime(); // je n'appelle cette méthode qu'à la fin, ainsi j'ai ici le vrai endtime
+		return totalTime-alphaTotal-betaPseudoTotal;
+	}
+	
+	/*
+	 * [0]: temps passé dans l'état U (jeton utilisé) = Total(nb_cs) * alpha
+	 * [1]: temps passé dans l'état T (jeton en transit) = total_token_msg * gamma
+	 * [2]: temps passé dans l'état N (possede le jeton mais ne l'utilise pas) = le reste
+	 */
+	private static Double[] getPerStateTime(long nb_cs_total, long totalTime) {
+		Double U = nb_cs_total * Configuration.getLong("protocol.naimitrehel.timeCS") + 0.0;
+		Double T = nb_cs_total * Configuration.getLong("protocol.transport.mindelay") + 0.0;
+		log.info("EndTime: "+totalTime+" U: "+U+", T: "+T+", N: "+(totalTime-(T+U)));
+		return new Double[] {(U/totalTime)*100, (T/totalTime)*100, ( (totalTime-(T+U))/totalTime )*100};
+	}
+	
+	public int getNbCs() {
+		return this.nb_cs;
 	}
 
 	////////////////////////////////////////// classe des messages
