@@ -54,7 +54,7 @@ public final class Constantes {
 		});
 
 		log.addHandler(handlerObj);
-		log.setLevel(Level.parse(Configuration.getString(PAR_LOG_LEVEL, Level.INFO.getName())));
+		log.setLevel(Level.parse(Configuration.getString(PAR_LOG_LEVEL, Level.OFF.getName())));
 	}
 
 }

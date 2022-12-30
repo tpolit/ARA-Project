@@ -1,6 +1,6 @@
 network.size 10
 simulation.experiment 1
-simulation.endtime 10000
+simulation.endtime 20000
 random.seed 20
 
 protocol.transport UniformRandomTransport
