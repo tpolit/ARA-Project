@@ -19,8 +19,8 @@ msgPerCsFile="./projet-src/output/msgPerCs.csv"
 reqCountFile="./projet-src/output/reqCount.csv"
 waitingTimeFile="./projet-src/output/waitingTime.csv"
 statePercentagesFile="./projet-src/output/statePercentages.csv"
-configFile="./Config.txt"
-
+configFile="$(dirname "${BASH_SOURCE[0]}")/Config.txt"
+echo $configFile
 sed -i "s/protocol.transport.mindelay\s[0-9]\+/protocol.transport.mindelay ${gamma}/" $configFile
 sed -i "s/protocol.transport.maxdelay\s[0-9]\+/protocol.transport.maxdelay ${gamma}/" $configFile
 
@@ -31,8 +31,7 @@ echo "Les differentes exécutions vont prendre à chaque fois un beta de cette l
 
 for beta in ${betaValues[@]}
 do
-	echo $beta
 	sed -i "s/protocol.naimitrehel.timeBetweenCS\s[0-9]\+/protocol.naimitrehel.timeBetweenCS $beta/" $configFile
 	## launch prog
-	/usr/lib/jvm/java-11-openjdk-amd64/bin/java -Dfile.encoding=UTF-8 -classpath /home/mazigh/Software/PSAR/peersim-1.0.5/peersim-doclet.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/peersim-1.0.5.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/jep-2.3.0.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/djep-1.0.0.jar:/home/mazigh/Studies/M2_S1/ARA/Eclipse_Workspace/ARA-Project/projet-src/bin peersim.Simulator ./Config.txt
+	/usr/lib/jvm/java-11-openjdk-amd64/bin/java -Dfile.encoding=UTF-8 -classpath /home/mazigh/Software/PSAR/peersim-1.0.5/peersim-doclet.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/peersim-1.0.5.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/jep-2.3.0.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/djep-1.0.0.jar:/home/mazigh/Studies/M2_S1/ARA/Eclipse_Workspace/ARA-Project/projet-src/bin peersim.Simulator $configFile
 done

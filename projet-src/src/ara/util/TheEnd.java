@@ -35,6 +35,10 @@ public class TheEnd implements Control{
 		reqCountFile = new File("./output/reqCount_"+alpha+"_"+gamma+".csv");
 		waitingTimeFile = new File("./output/waitingTime_"+alpha+"_"+gamma+".csv");
 		statePercentagesFile = new File("./output/statePercentages_"+alpha+"_"+gamma+".csv");
+		msgPerCsFile.createNewFile();
+		reqCountFile.createNewFile();
+		waitingTimeFile.createNewFile();
+		statePercentagesFile.createNewFile();
 		// System.out.println(msgPerCsFile.createNewFile()+" "+reqCountFile.createNewFile()+" "+waitingTimeFile.createNewFile()+" "+statePercentagesFile.createNewFile());
 		// instantiating writers
 		msgPerCsWriter = new FileWriter(msgPerCsFile, true);
@@ -86,8 +90,8 @@ public class TheEnd implements Control{
 		Double[] statePercentages = NaimiTrehelAlgo.getPerStateTime(nb_cs_total, CommonState.getTime());
 		try {
 			msgPerCsWriter.append(beta+","+msgPerCs+"\n");
-			reqCountWriter.append(beta+","+((double)waitingTimeTotal/Network.getCapacity())+"\n");
-			waitingTimeWriter.append(beta+","+((double)req_total/Network.getCapacity())+"\n");
+			waitingTimeWriter.append(beta+","+((double)waitingTimeTotal/Network.getCapacity())+"\n");
+			reqCountWriter.append(beta+","+((double)req_total/Network.getCapacity())+"\n");
 			statePercentagesWriter.append(beta+","+statePercentages[0]+","+statePercentages[1]+","+statePercentages[2]+"\n");
 			msgPerCsWriter.flush();
 			reqCountWriter.flush();

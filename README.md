@@ -11,3 +11,9 @@ nous exécuterons cette application dans un environnement non fiable (un nœud p
 ber en panne). Dans ce cas, l’application se basera sur un protocole distribué de points
 de reprise (checkpointing) permettant de sauvegarder l’état des nœuds régulièrement et
 de reprendre l’exécution à un état stable en cas d’erreur ou de panne.
+
+## Notes :
+
+Faire bien attention à lancer le script avec un terminal placé sur le repertoire, sinon 
+les chemin de fichiers de sorties ne seront pas atteignables par le write vu qu'ils sont 
+relatifs.
