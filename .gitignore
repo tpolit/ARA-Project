@@ -36,6 +36,7 @@ tutoriel/
 
 # OUTPUTS
 *.csv
+*.png
 
 ########## LATEX ############
 

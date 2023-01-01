@@ -35,20 +35,18 @@ public class TheEnd implements Control{
 		reqCountFile = new File("./output/reqCount_"+alpha+"_"+gamma+".csv");
 		waitingTimeFile = new File("./output/waitingTime_"+alpha+"_"+gamma+".csv");
 		statePercentagesFile = new File("./output/statePercentages_"+alpha+"_"+gamma+".csv");
+		
 		msgPerCsFile.createNewFile();
 		reqCountFile.createNewFile();
 		waitingTimeFile.createNewFile();
 		statePercentagesFile.createNewFile();
+		
 		// System.out.println(msgPerCsFile.createNewFile()+" "+reqCountFile.createNewFile()+" "+waitingTimeFile.createNewFile()+" "+statePercentagesFile.createNewFile());
 		// instantiating writers
 		msgPerCsWriter = new FileWriter(msgPerCsFile, true);
-		msgPerCsWriter.write("beta,msgPerCs\n");
 		reqCountWriter = new FileWriter(reqCountFile, true);
-		reqCountWriter.write("beta,reqCount\n");
 		waitingTimeWriter = new FileWriter(waitingTimeFile, true);
-		waitingTimeWriter.write("beta,waitingTime\n");
 		statePercentagesWriter = new FileWriter(statePercentagesFile, true);
-		statePercentagesWriter.write("beta,U,T,N\n");
 	}
 	
 	@Override
