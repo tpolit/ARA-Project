@@ -2,7 +2,9 @@ package ara.util;
 
 import static ara.util.Constantes.log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -23,7 +25,7 @@ public class TheEnd implements Control{
 	 * */
 	private File msgPerCsFile, reqCountFile, waitingTimeFile, statePercentagesFile;
 	private Writer msgPerCsWriter, reqCountWriter, waitingTimeWriter, statePercentagesWriter;
-	
+	private boolean fileCreated = false; 
 	private static final String PAR_ALGO = "algo";
 	private final int algoPid;
 	public TheEnd(String prefix) throws IOException {
@@ -35,13 +37,9 @@ public class TheEnd implements Control{
 		reqCountFile = new File("./output/reqCount_"+alpha+"_"+gamma+".csv");
 		waitingTimeFile = new File("./output/waitingTime_"+alpha+"_"+gamma+".csv");
 		statePercentagesFile = new File("./output/statePercentages_"+alpha+"_"+gamma+".csv");
+		fileCreated = msgPerCsFile.createNewFile()&reqCountFile.createNewFile()&waitingTimeFile.createNewFile()&statePercentagesFile.createNewFile();
 		
-		msgPerCsFile.createNewFile();
-		reqCountFile.createNewFile();
-		waitingTimeFile.createNewFile();
-		statePercentagesFile.createNewFile();
-		
-		// System.out.println(msgPerCsFile.createNewFile()+" "+reqCountFile.createNewFile()+" "+waitingTimeFile.createNewFile()+" "+statePercentagesFile.createNewFile());
+		System.out.println(fileCreated);
 		// instantiating writers
 		msgPerCsWriter = new FileWriter(msgPerCsFile, true);
 		reqCountWriter = new FileWriter(reqCountFile, true);
@@ -54,7 +52,8 @@ public class TheEnd implements Control{
 	{
 		//StringBuffer dataLine = new StringBuffer();
 		long nb_cs_total = 0;
-		int req_total=0; // token_total == nb_cs_total
+		int req_total=0; 
+		int tok_total=0;// token_total != nb_cs_total
 		double msgPerCs = 0.0;
 		long waitingTimeTotal = 0;
 		long beta = Configuration.getLong("protocol.naimitrehel.timeBetweenCS");
@@ -65,6 +64,7 @@ public class TheEnd implements Control{
 			//log.info("Node #"+node.getID()+" : "+algo.getNodeInfo());
 			nb_cs_total += algo.getNbCs();
 			req_total += algo.getReqCount();
+			tok_total += algo.getTokenCount();
 			waitingTimeTotal += algo.getWaitingTime();
 		}
 		
@@ -84,17 +84,25 @@ public class TheEnd implements Control{
 	
 		log.info("M3-Moyenne de requestCount: "+((double)req_total/Network.getCapacity()));
 		
-		log.info("M4-"+NaimiTrehelAlgo.getPerStateTimeInfo(nb_cs_total, CommonState.getTime()));
-		Double[] statePercentages = NaimiTrehelAlgo.getPerStateTime(nb_cs_total, CommonState.getTime());
+		log.info("M4-"+NaimiTrehelAlgo.getPerStateTimeInfo(nb_cs_total, tok_total, CommonState.getTime()));
+		Double[] statePercentages = NaimiTrehelAlgo.getPerStateTime(nb_cs_total, tok_total, CommonState.getTime());
 		try {
-			msgPerCsWriter.append(beta+","+msgPerCs+"\n");
-			waitingTimeWriter.append(beta+","+((double)waitingTimeTotal/Network.getCapacity())+"\n");
-			reqCountWriter.append(beta+","+((double)req_total/Network.getCapacity())+"\n");
-			statePercentagesWriter.append(beta+","+statePercentages[0]+","+statePercentages[1]+","+statePercentages[2]+"\n");
-			msgPerCsWriter.flush();
-			reqCountWriter.flush();
-			waitingTimeWriter.flush();
-			statePercentagesWriter.flush();
+			if(Configuration.getLong("random.seed") == 20) {
+				msgPerCsWriter.append(beta+","+msgPerCs+"\n");
+				waitingTimeWriter.append(beta+","+((double)waitingTimeTotal/Network.getCapacity())+"\n");
+				reqCountWriter.append(beta+","+((double)req_total/Network.getCapacity())+"\n");
+				statePercentagesWriter.append(beta+","+statePercentages[0]+","+statePercentages[1]+","+statePercentages[2]+"\n");
+				msgPerCsWriter.flush();
+				reqCountWriter.flush();
+				waitingTimeWriter.flush();
+				statePercentagesWriter.flush();
+			}
+			else {
+				addInfoToLine(msgPerCsFile, beta, String.valueOf(msgPerCs));
+				addInfoToLine(reqCountFile, beta, String.valueOf(((double)req_total/Network.getCapacity())));
+				addInfoToLine(waitingTimeFile, beta, String.valueOf(((double)waitingTimeTotal/Network.getCapacity())));
+				addInfoToLine(statePercentagesFile, beta, statePercentages[0]+","+statePercentages[1]+","+statePercentages[2]);
+			}
 		} catch (IOException e) {
 			System.err.println("Error in writing!!");
 		} finally {
@@ -108,5 +116,24 @@ public class TheEnd implements Control{
 			}
 		}
 		return false;
+	}
+	
+	public void addInfoToLine(File f, long beta, String info) throws IOException{
+		BufferedReader filein = new BufferedReader(new FileReader(f));
+		StringBuffer inputBuffer = new StringBuffer();
+		String line;
+		while((line = filein.readLine())!=null) {
+			if(line.startsWith(String.valueOf(beta)+",")) { // ajouter la virgule pour ne pas confendre 20 et 200 ...
+				line = line+","+info;
+			}
+			inputBuffer.append(line);
+			inputBuffer.append("\n");
+		}
+		filein.close();
+		
+		FileWriter fileout = new FileWriter(f);
+		fileout.write(inputBuffer.toString()); // write to replace
+		fileout.close();
+		
 	}
 }

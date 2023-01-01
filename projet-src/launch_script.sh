@@ -14,8 +14,8 @@ randomSeeds=(20 784 365 874)
 executionTime=$3
 gamma=$2
 alpha=$1
-betaValues=(0 20 40 60 80 100 120 140 160 180 200 220 240 260)
-# betaValues=(0 100 200 300 400 500 600 700 800 900 1000)
+#betaValues=(0 20 40 60 80 100 120 140 160 180 200 220 240 260)
+betaValues=(0 100 150 200 250 300 350 400 450 500 550 600 650 700) # apres 700, le programme boucle trop (la cause ???)
 
 ## d'autres tests de sécurité sur les valeurs de gamma et alpha.
 if [ $((${gamma}+${alpha})) -gt ${executionTime} ]
@@ -38,7 +38,6 @@ waitingTimeFile="./projet-src/output/waitingTime.csv"
 statePercentagesFile="./projet-src/output/statePercentages.csv"
 configFile="$(dirname "${BASH_SOURCE[0]}")/Config.txt"
 # echo $configFile
-sed -i "s/random.seed\s[0-9]\+/random.seed ${randomSeed}/" $configFile
 
 sed -i "s/simulation.endtime\s[0-9]\+/simulation.endtime ${executionTime}/" $configFile
 
@@ -53,25 +52,12 @@ echo "Les differentes exécutions vont prendre à chaque fois un beta de cette l
 # printf "beta, msgPerCs\n">> ./output/msgPerCs_${alpha}_${gamma}.csv
 for seed in ${randomSeeds[@]}
 do
+	sed -i "s/random.seed\s[0-9]\+/random.seed ${seed}/" $configFile
+
 	for beta in ${betaValues[@]}
 	do
 		sed -i "s/protocol.naimitrehel.timeBetweenCS\s[0-9]\+/protocol.naimitrehel.timeBetweenCS $beta/" $configFile
 		## launch sim
 		/usr/lib/jvm/java-11-openjdk-amd64/bin/java -Dfile.encoding=UTF-8 -classpath /home/mazigh/Software/PSAR/peersim-1.0.5/peersim-doclet.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/peersim-1.0.5.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/jep-2.3.0.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/djep-1.0.0.jar:/home/mazigh/Studies/M2_S1/ARA/Eclipse_Workspace/ARA-Project/projet-src/bin peersim.Simulator $configFile
 	done
-
-	# pour séparer les dataset par seed
-	if [ $seed -ne 874 ]; then
-		printf "\n\n\n">> ./output/msgPerCs_${alpha}_${gamma}.csv
-		printf "\n\n\n">> ./output/reqCount_${alpha}_${gamma}.csv
-		printf "\n\n\n">> ./output/waitingTime_${alpha}_${gamma}.csv
-		printf "\n\n\n">> ./output/statePercentages_${alpha}_${gamma}.csv
-	fi
 done
-
-# plotting
-cd output
-gnuplot 'waitingTime.gnu'
-gnuplot 'msgPerCs.gnu'
-gnuplot 'reqCount.gnu'
-gnuplot 'statePercentages.gnu'

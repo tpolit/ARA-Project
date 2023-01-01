@@ -10,9 +10,6 @@ set style histogram clustered gap 1
 datafile1 = 'waitingTime_499_1.csv'
 datafile2 = 'waitingTime_280_220.csv'
 datafile3 = 'waitingTime_10_490.csv'
-
-set samples 
-
-plot [ ] [0:] datafile1 index(0) using 2:xticlabels(1)  title "waitingTime a=999, g=1" with histogram lc rgb'green',\
-datafile2 index(1) using 2:xticlabels(1)  title "waitingTime a=550, g=450" with histogram lc rgb'red',\
-datafile3 index(2) using 2:xticlabels(1)  title "waitingTime a=10, g=990" with histogram lc rgb'blue'
+plot [ ] [0:] datafile1 using (($2+$3+$4+$5)/4):xticlabels(1)  title "waitingTime a=999, g=1" with histogram lc rgb'green',\
+datafile2 using (($2+$3+$4+$5)/4):xticlabels(1)  title "waitingTime a=550, g=450" with histogram lc rgb'red',\
+datafile3 using (($2+$3+$4+$5)/4):xticlabels(1)  title "waitingTime a=10, g=990" with histogram lc rgb'blue'
