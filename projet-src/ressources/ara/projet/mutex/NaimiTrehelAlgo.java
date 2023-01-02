@@ -44,9 +44,11 @@ public class NaimiTrehelAlgo implements EDProtocol {
 	// variables d'état de l'application
 	protected State state;
 	protected Queue<Long> next;
-	protected long last; // le father d'AR
+	protected long last;
 	protected int nb_cs = 0;// permet de compter le nombre de section critiques
 							// exécutées par le noeud
+	protected int req_counter = 0;
+	protected int tok_counter = 0;
 	protected int global_counter = 0; // compteur qui sera inclu dans le message
 										// jeton, sa valeur est égale à la
 										// dernière valeur connue
@@ -71,7 +73,8 @@ public class NaimiTrehelAlgo implements EDProtocol {
 
 		transport_id = Configuration.getPid(prefix + "." + PAR_TRANSPORT);
 		timeCS = Configuration.getLong(prefix + "." + PAR_TIME_CS);
-		timeBetweenCS = Configuration.getLong(prefix + "." + PAR_TIME_BETWEEN_CS);
+		timeBetweenCS = Configuration
+				.getLong(prefix + "." + PAR_TIME_BETWEEN_CS);
 
 	}
 
@@ -82,6 +85,7 @@ public class NaimiTrehelAlgo implements EDProtocol {
 		} catch (CloneNotSupportedException e) {
 		} // never happens
 		res.initialisation(CommonState.getNode());
+
 		return res;
 	}
 
@@ -114,9 +118,11 @@ public class NaimiTrehelAlgo implements EDProtocol {
 			if (m instanceof RequestMessage) {
 				RequestMessage rm = (RequestMessage) m;
 				this.receive_request(node, m.getIdSrc(), rm.getRequester());
+				//log.info(rm.toString());
 			} else if (m instanceof TokenMessage) {
 				TokenMessage tm = (TokenMessage) m;
 				this.receive_token(node, tm.getIdSrc(), tm.getNext(), tm.getCounter());
+				//log.info(tm.toString());
 			} else {
 				throw new RuntimeException("Receive unknown type Message");
 			}
@@ -156,7 +162,7 @@ public class NaimiTrehelAlgo implements EDProtocol {
 			Node dest = Network.get((int) last);
 			tr.send(host, dest, new RequestMessage(host.getID(), dest.getID(),
 					protocol_id, host.getID()), protocol_id);
-			// this.req_counter++; // req counter
+			this.req_counter++;
 			last = nil;
 			return;// on simule un wait ici
 		}
@@ -179,7 +185,7 @@ public class NaimiTrehelAlgo implements EDProtocol {
 					new TokenMessage(host.getID(), dest.getID(), protocol_id,
 							new ArrayDeque<Long>(next), global_counter),
 					protocol_id);
-			// this.tok_counter++; // token counter
+			this.tok_counter++;
 			next.clear();
 		}
 	}
@@ -200,15 +206,13 @@ public class NaimiTrehelAlgo implements EDProtocol {
 				tr.send(host, dest, new TokenMessage(host.getID(), dest.getID(),
 						protocol_id, new ArrayDeque<Long>(), global_counter),
 						protocol_id);
-				// this.tok_counter++; // token counter
+				this.tok_counter++;
 				last = requester;
 			}
 		} else {
-			log.info("Request message intermediaire!!");
 			Node dest = Network.get((int) last);
 			tr.send(host, dest, new RequestMessage(host.getID(), dest.getID(),
 					protocol_id, requester), protocol_id);
-			// this.req_counter++; // request counter
 			last = requester;
 		}
 	}
@@ -259,6 +263,11 @@ public class NaimiTrehelAlgo implements EDProtocol {
 				new InternalEvent(TypeEvent.request_cs, id_execution), host,
 				protocol_id);
 
+	}
+	
+	////////////////////////////////////////// TO MOVE TO A SUBCLASS ////////////////////////////////////////////////////
+	public String getInfoEnd() {
+		return "RequestMsg :"+this.req_counter+", TokenMsg:"+this.tok_counter;
 	}
 
 	////////////////////////////////////////// classe des messages
