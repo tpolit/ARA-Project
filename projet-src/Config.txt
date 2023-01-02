@@ -4,13 +4,13 @@ simulation.endtime 20000
 random.seed 874
 
 protocol.transport UniformRandomTransport
-protocol.transport.mindelay 490 # gamma
-protocol.transport.maxdelay 490
+protocol.transport.mindelay 400 # gamma
+protocol.transport.maxdelay 400
 
 protocol.fifotransport FIFOTransport
 protocol.fifotransport.transport transport
 
-protocol.naimitrehel NaimiTrehelAlgo
+protocol.naimitrehel NaimiTrehelAlgoInfo
 protocol.naimitrehel.transport fifotransport
 protocol.naimitrehel.timeCS 10 #alpha
 protocol.naimitrehel.timeBetweenCS 700 #beta
