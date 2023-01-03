@@ -8,7 +8,7 @@
 %
 %    Francois LOUF / modif O. Polit
 %
-%    Date de cration        : 03/09/2003
+%    Date de crÂation        : 03/09/2003
 %    Date de modification : 03/09/2006
 % =====================================================================
 
@@ -24,7 +24,7 @@
 \typeout{}
 \typeout{Style LaTeX pour Cours et Examen UFR SITEC}
 \typeout{}
-% -----------------------------------------> Codage des caractres <---
+% -----------------------------------------> Codage des caractÂres <---
 
 \usepackage[applemac]{inputenc}
 \usepackage[T1]{fontenc}
@@ -33,8 +33,8 @@
 
 % -----------------------------------------------> Packages divers <---
 
-\usepackage{amsmath,amssymb}   % Pour tendre les fonctions maths
- \usepackage{fancybox}          % Pour faire de jolies bo”tes
+\usepackage{amsmath,amssymb}   % Pour Âtendre les fonctions maths
+ \usepackage{fancybox}          % Pour faire de jolies boÂ”tes
 \usepackage{euscript}          % Pour faire de jolies lettres
 \usepackage{calc}              % Pour faire des calculs
 \usepackage{ifthen}        % Pour les tests
@@ -121,7 +121,7 @@
 % 
 % 
 % 
-% --------------------------------------------> Rglages de marges <---
+% --------------------------------------------> RÂglages de marges <---
 
 %%% dvi
        \textheight=23.2cm
@@ -145,7 +145,7 @@
 % Marge haute sur la page
 % \setlength{\topmargin}{0.pt}
 
-% Entte
+% EntÂte
 % \setlength{\headheight}{0. mm}
 % \setlength{\headsep}{11. mm}
 
@@ -154,7 +154,7 @@
 % \setlength{\voffset}{-70pt}
 
 
-% --------------------------------------> Rglages des paragraphes <---
+% --------------------------------------> RÂglages des paragraphes <---
 
 % Indentation
 \setlength{\parindent}{0. cm}
@@ -162,17 +162,17 @@
 % Espace inter paragraphe
 \setlength{\parskip}{0. cm}
 
-% --------------------------------------> Rglages de l'interligne <---
+% --------------------------------------> RÂglages de l'interligne <---
 
 \def\baselinestretch{1.2}
 
-% --------------------------------------------------------> Entte <---
+% --------------------------------------------------------> EntÂte <---
 
 \newcommand{\entete}[6]{
 
   \begin{center}
 
-% Pas de numro sur la premire page
+% Pas de numÂro sur la premiÂre page
     \thispagestyle{empty}  
   
 % Logo
@@ -192,8 +192,8 @@
     {\large {\bf #3}}
     \vskip 1.5 em
     
-% Dure
-    \ifthenelse{\equal{#4}{}}{}{\large{\bf Dure : #4}}
+% DurÂe
+    \ifthenelse{\equal{#4}{}}{}{\large{\bf DurÂe : #4}}
 
 % Date
     #5
@@ -229,7 +229,7 @@
 
 \fancyfoot[RE, LO]{#3 (File \jobname.tex)}
 
-% Redfinition de l'paisseur des rgles
+% RedÂfinition de l'Âpaisseur des rÂgles
 \renewcommand{\headrulewidth}{.5pt}
 \renewcommand{\footrulewidth}{.5pt}
 }
@@ -258,7 +258,7 @@
 
 % ------------------------------------------------------> Tableaux <---
 
-% Pour crire sur plusieurs colonnes
+% Pour Âcrire sur plusieurs colonnes
 \usepackage{multicol}
 
 % Pour utiliser des figures multiples
@@ -282,21 +282,21 @@
     }
 }
 
-% ----------------------------------------------------> Dfinitions <---
+% ----------------------------------------------------> DÂfinitions <---
 
 \newcommand{\definition}[1]{
     {
     \setlength{\parskip}{10pt}%
-     \par\noindent\textbf{Dfinition}.\ --\ #1
+     \par\noindent\textbf{DÂfinition}.\ --\ #1
     }
 }
     
-% ----------------------------------------------------> Dfinitions <---
+% ----------------------------------------------------> DÂfinitions <---
 
 \newcommand{\theo}[1]{
     {
     \setlength{\parskip}{10pt}%
-     \par\noindent\textbf{Thorme}.\ --\ #1
+     \par\noindent\textbf{ThÂorÂme}.\ --\ #1
     }
 }
     
@@ -319,12 +319,12 @@
     }
 }
 
-% ----------------------------------------------------> Proprits <---
+% ----------------------------------------------------> PropriÂtÂs <---
 \newcommand{\prop}
 {
     {
     \setlength{\parskip}{10pt}%
-    \par \noindent \textit{Proprits} : \e 
+    \par \noindent \textit{PropriÂtÂs} : \e 
     }
 }
 
@@ -345,17 +345,17 @@
     \par \noindent \LigneVert{ #1 }
     }
 }
-% prsence ou non de la correction pour l'impression : A MEDITER
-% \ifthenelse{\equal{#4}{}}{}{\large{\bf Dure : #4}}
+% prÂsence ou non de la correction pour l'impression : A MEDITER
+% \ifthenelse{\equal{#4}{}}{}{\large{\bf DurÂe : #4}}
 
 % ----------------------------------------------------> HyperTeX <---
-\usepackage{hyperref} % Crer des liens et des signets 
+\usepackage{hyperref} % CrÂer des liens et des signets 
 \hypersetup{	
 colorlinks=true, %colorise les liens 
-breaklinks=true, %permet le retour ˆ la ligne dans les liens trop longs 
+breaklinks=true, %permet le retour Âˆ la ligne dans les liens trop longs 
 urlcolor= blue, %couleur des hyperliens 
 linkcolor= blue,	%couleur des liens internes 
-citecolor=black,	%couleur des rfrences 
+citecolor=black,	%couleur des rÂfÂrences 
 pdftitle={ }, %informations apparaissant dans 
 pdfauthor={O. Polit}, %les informations du document 
 pdfsubject={ }	%sous Acrobat. 
