@@ -5,7 +5,7 @@ Réalisation d'une étude expérimentale d'algorithmes répartis grâce au simul
 - Lancez le script `launch_all.sh` dans le repertoire `projet-src` avec comme argument la durée de la simulation.
     ```shell
     cd path_to_projet-src
-    bash ./launch_all.sh 20000
+    bash ./launch_all.sh 100000
     ```
 - Les données et figures des métriques seront sous le repértoire `projet-src/output/`.
 
