@@ -2,6 +2,13 @@
 
 Réalisation d'une étude expérimentale d'algorithmes répartis grâce au simulateur PeerSim.
 
+- Lancez le script `launch_all.sh` dans le repertoire `projet-src` avec comme argument la durée de la simulation.
+    ```shell
+    cd path_to_projet-src
+    bash ./launch_all.sh 20000
+    ```
+- Les données et figures des métriques seront sous le repértoire `projet-src/output/`.
+
 ## Objectifs : 
 
 Le but de ce projet est de faire une étude expérimentale à travers le simulateur Peer-

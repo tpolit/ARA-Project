@@ -15,7 +15,13 @@ executionTime=$3
 gamma=$2
 alpha=$1
 #betaValues=(0 20 40 60 80 100 120 140 160 180 200 220 240 260)
-betaValues=(0 100 150 200 250 300 350 400 450 500 550 600 650 700) # apres 700, le programme boucle trop (la cause ???)
+#betaValues=(50 250 450 550 600 650 700 750 850 1050 1250 1450 1650 1850 2050 2250 2450 2650 2850 3050) # apres 700, le programme boucle trop (la cause: poisson!)
+betaValues=(50)
+i=1
+while [ $i -lt 30 ]; do	
+	betaValues[i]=$(($betaValues+$i*100))
+	((i++))
+done
 
 ## d'autres tests de sécurité sur les valeurs de gamma et alpha.
 if [ $((${gamma}+${alpha})) -gt ${executionTime} ]
@@ -32,17 +38,13 @@ fi
 
 
 ## les differents fichiers
-msgPerCsFile="./projet-src/output/msgPerCs.csv"
-reqCountFile="./projet-src/output/reqCount.csv"
-waitingTimeFile="./projet-src/output/waitingTime.csv"
-statePercentagesFile="./projet-src/output/statePercentages.csv"
 configFile="$(dirname "${BASH_SOURCE[0]}")/Config.txt"
 # echo $configFile
 
 sed -i "s/simulation.endtime\s[0-9]\+/simulation.endtime ${executionTime}/" $configFile
 
-sed -i "s/protocol.transport.mindelay\s[0-9]\+/protocol.transport.mindelay ${gamma}/" $configFile
-sed -i "s/protocol.transport.maxdelay\s[0-9]\+/protocol.transport.maxdelay ${gamma}/" $configFile
+sed -i "s/protocol.transport.mindelay\s[0-9]\+/protocol.transport.mindelay $((${gamma}))/" $configFile
+sed -i "s/protocol.transport.maxdelay\s[0-9]\+/protocol.transport.maxdelay $((${gamma}+${gamma}/10))/" $configFile
 
 sed -i "s/protocol.naimitrehel.timeCS\s[0-9]\+/protocol.naimitrehel.timeCS ${alpha}/" $configFile
 

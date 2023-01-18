@@ -1,7 +1,5 @@
 package ara.util;
 
-import static ara.util.Constantes.log;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import ara.projet.mutex.NaimiTrehelAlgo;
 import ara.projet.mutex.NaimiTrehelAlgoInfo;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
@@ -24,8 +21,8 @@ public class TheEnd implements Control{
 	 * faire un script qui créer dynamiquement le config.txt avec alpha et gamma comme arguments du script et beta une variable local.
 	 * à chaque config.txt le script va lancer la simulation.
 	 * */
-	private File msgPerCsFile, reqCountFile, waitingTimeFile, statePercentagesFile, rhoFile;
-	private Writer msgPerCsWriter, reqCountWriter, waitingTimeWriter, statePercentagesWriter, rhoWriter;
+	private File msgPerCsFile, reqCountFile, waitingTimeFile, statePercentagesFile;
+	private Writer msgPerCsWriter, reqCountWriter, waitingTimeWriter, statePercentagesWriter;
 	private boolean fileCreated = false; 
 	private static final String PAR_ALGO = "algo";
 	private final int algoPid;
@@ -38,8 +35,8 @@ public class TheEnd implements Control{
 		reqCountFile = new File("./output/reqCount_"+alpha+"_"+gamma+".csv");
 		waitingTimeFile = new File("./output/waitingTime_"+alpha+"_"+gamma+".csv");
 		statePercentagesFile = new File("./output/statePercentages_"+alpha+"_"+gamma+".csv");
-		rhoFile = new File("./output/rhoRatio_"+alpha+"_"+gamma+".csv");
-		fileCreated = msgPerCsFile.createNewFile()&reqCountFile.createNewFile()&waitingTimeFile.createNewFile()&statePercentagesFile.createNewFile()&rhoFile.createNewFile();
+		
+		fileCreated = msgPerCsFile.createNewFile()&reqCountFile.createNewFile()&waitingTimeFile.createNewFile()&statePercentagesFile.createNewFile();
 		
 		// System.out.println(fileCreated);
 		// instantiating writers
@@ -47,7 +44,6 @@ public class TheEnd implements Control{
 		reqCountWriter = new FileWriter(reqCountFile, true);
 		waitingTimeWriter = new FileWriter(waitingTimeFile, true);
 		statePercentagesWriter = new FileWriter(statePercentagesFile, true);
-		rhoWriter = new FileWriter(rhoFile, true);
 	}
 	
 	@Override
@@ -55,10 +51,13 @@ public class TheEnd implements Control{
 	{
 		//StringBuffer dataLine = new StringBuffer();
 		long nb_cs_total = 0;
-		int req_total=0; 
+		int req_total=0;
+		//int req_inter_total=0;
 		int tok_total=0;// token_total != nb_cs_total
 		double msgPerCs = 0.0;
-		long waitingTimeTotal = 0;
+		double waitingTimeTotal = 0;
+		double waitingTimeEcartType = 0;
+		double rho = 0.0;
 		long beta = Configuration.getLong("protocol.naimitrehel.timeBetweenCS");
 		long alpha = Configuration.getLong("protocol.naimitrehel.timeCS");
 		long gamma = Configuration.getLong("protocol.transport.mindelay");
@@ -66,54 +65,54 @@ public class TheEnd implements Control{
 		for(int i=0; i < Network.getCapacity() ; i++) {
 			Node node = Network.get(i);
 			NaimiTrehelAlgoInfo algo = (NaimiTrehelAlgoInfo)node.getProtocol(algoPid);
-			//log.info("Node #"+node.getID()+" : "+algo.getNodeInfo());
+			////log.info("Node #"+node.getID()+" : "+algo.getNodeInfo());
 			nb_cs_total += algo.getNbCs();
 			req_total += algo.getReqCount();
+			//req_inter_total += algo.getReqInterCount();
 			tok_total += algo.getTokenCount();
-			waitingTimeTotal += algo.getWaitingTime();
-			log.info(node.getID()+": "+algo.getNodeInfo());
+			
+			double[] temp = algo.getWaitingTime();
+			waitingTimeTotal += temp[0];
+			waitingTimeEcartType += temp[1];
+			////log.info(node.getID()+": "+algo.getNodeInfo());
 		}
-		log.info("M1-Messages info: \n\t-Request: "+req_total+"\n\t-Token: "+nb_cs_total);
-		msgPerCs = ((double)(nb_cs_total+req_total))/nb_cs_total;
-		log.info("M1-Nombre de messages par section critique (approximation avec les sommes): ("+(req_total+nb_cs_total)+")/"+nb_cs_total+"= "+msgPerCs);
+		//log.info("M1-Messages info: \n\t-Request: "+req_total+"\n\t-Token: "+nb_cs_total);
+		msgPerCs = ((double)(tok_total+req_total))/nb_cs_total;
+		//log.info("M1-Nombre de messages par section critique (approximation avec les sommes): ("+(req_total+tok_total)+")/"+nb_cs_total+"= "+msgPerCs);
 		
 		
-		log.info("-Nombre de messages requetes et temps d'attente par noeud: ");
+		//log.info("-Nombre de messages requetes et temps d'attente par noeud: ");
 		for(int i=0; i < Network.getCapacity() ; i++) {
 			Node node = Network.get(i);
 			NaimiTrehelAlgoInfo algo = (NaimiTrehelAlgoInfo)node.getProtocol(algoPid);
-			log.info("\t-Node #"+node.getID()+" : RequestCount = "+algo.getReqCount()+", WaitingTime = "+algo.getWaitingTime());
+			//log.info("\t-Node #"+node.getID()+" : RequestCount = "+algo.getReqCount()+", RequestInterCount = "+algo.getReqInterCount()+" , WaitingTime = "+algo.getWaitingTime());
 		}
 		
-		log.info("M2-Moyenne de Timewaiting: "+((double)waitingTimeTotal/Network.getCapacity()));
+		//log.info("M2-Moyenne de Timewaiting par Cs: "+((double)waitingTimeTotal/Network.getCapacity()));
 	
-		log.info("M3-Moyenne de requestCount: "+((double)req_total/Network.getCapacity()));
+		//log.info("M3-Moyenne de requestCount: "+((double)req_total/Network.getCapacity()));
 		
-		log.info("M4-"+NaimiTrehelAlgoInfo.getPerStateTimeInfo(nb_cs_total, tok_total, CommonState.getTime()));
+		//log.info("M4-"+NaimiTrehelAlgoInfo.getPerStateTimeInfo(nb_cs_total, tok_total, CommonState.getTime()));
 		Double[] statePercentages = NaimiTrehelAlgoInfo.getPerStateTime(nb_cs_total, tok_total, CommonState.getTime());
+		rho = ((double)(alpha+gamma))/beta;
+		//log.info("Rho- "+rho);
 		
-		log.info("Rho- "+((double)(alpha+gamma))/beta);
 		try {
 			if(Configuration.getLong("random.seed") == 20) {
 				msgPerCsWriter.append(beta+","+msgPerCs+"\n");
-				waitingTimeWriter.append(beta+","+((double)waitingTimeTotal/Network.getCapacity())+"\n");
+				waitingTimeWriter.append(beta+","+((double)waitingTimeTotal/Network.getCapacity())+","+(waitingTimeEcartType/Network.getCapacity())+"\n");
 				reqCountWriter.append(beta+","+((double)req_total/Network.getCapacity())+"\n");
 				statePercentagesWriter.append(beta+","+statePercentages[0]+","+statePercentages[1]+","+statePercentages[2]+"\n");
 				msgPerCsWriter.flush();
 				reqCountWriter.flush();
 				waitingTimeWriter.flush();
 				statePercentagesWriter.flush();
-				if(beta != 0) {
-					rhoWriter.append(beta+","+((double)(alpha+gamma))/beta+"\n");
-					rhoWriter.flush();
-				}
 			}
 			else {
 				addInfoToLine(msgPerCsFile, beta, String.valueOf(msgPerCs));
 				addInfoToLine(reqCountFile, beta, String.valueOf(((double)req_total/Network.getCapacity())));
-				addInfoToLine(waitingTimeFile, beta, String.valueOf(((double)waitingTimeTotal/Network.getCapacity())));
+				addInfoToLine(waitingTimeFile, beta, String.valueOf((double)waitingTimeTotal/Network.getCapacity())+","+String.valueOf(waitingTimeEcartType/Network.getCapacity()));
 				addInfoToLine(statePercentagesFile, beta, statePercentages[0]+","+statePercentages[1]+","+statePercentages[2]);
-				if(beta != 0) addInfoToLine(rhoFile, beta, String.valueOf(((double)(alpha+gamma))/beta));
 			}
 		} catch (IOException e) {
 			System.err.println("Error in writing!!");

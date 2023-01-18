@@ -10,10 +10,12 @@ import peersim.core.Node;
 
 public class NaimiTrehelAlgoInfo extends NaimiTrehelAlgo {
 
-	protected int req_counter = 0; // calcule que les messages recus
+	protected int req_counter = 0; // calcule toutes les requetes recus recus
+	protected int req_inter_counter = 0; // calcule les requetes intermediaires
 	protected int tok_counter = 0; // calcules que les tokens arrivé à destination
 	// protected int beta_counter = 0;
-	protected List<Long> beta_starting = null;
+	protected List<Long> req_dates = null;
+	protected List<Long> cs_dates = null;
 
 	public NaimiTrehelAlgoInfo(String prefix) {
 		super(prefix);
@@ -33,6 +35,8 @@ public class NaimiTrehelAlgoInfo extends NaimiTrehelAlgo {
 		if (event instanceof Message) {
 			Message m = (Message) event;
 			if (m instanceof RequestMessage) {
+				if(((RequestMessage) m).getRequester()!=m.getIdSrc())
+					req_inter_counter++;
 				req_counter++;
 			} else if (m instanceof TokenMessage) {
 				tok_counter++;
@@ -49,11 +53,12 @@ public class NaimiTrehelAlgoInfo extends NaimiTrehelAlgo {
 		this.state = s;
 		switch (this.state) {
 			case inCS :
+				if(cs_dates == null) cs_dates = new ArrayList<>();
+				cs_dates.add(CommonState.getTime());
 				break;
-			case tranquil :
-				// beta_counter++;
-				if(beta_starting == null) beta_starting = new ArrayList<>();
-				beta_starting.add(CommonState.getTime());
+			case requesting :
+				if(req_dates == null) req_dates = new ArrayList<>();
+				req_dates.add(CommonState.getTime());
 				break;
 			default :
 		}
@@ -68,7 +73,7 @@ public class NaimiTrehelAlgoInfo extends NaimiTrehelAlgo {
 		// String betaInfo = "Temps passé à attendre de mon plein grés (attention, au max un beta n'est pas inclus): "+betaPseudoTotal+".";
 		String waitInfo = "Temps passé en requestion (approx à cause de beta et du temps total): "+ (this.getWaitingTime()) + ".";
 		// return messagesCounter+"\n\t\t"+alphaInfo+"\n\t\t"+betaInfo+"\n\t\t"+waitInfo;
-		return messagesCounter + "\n\t\t" + waitInfo + "\n\t\t Beta_Starting: "+beta_starting;
+		return messagesCounter + "\n\t\t" + waitInfo + "\n\t\t Beta_Starting: "+this.getWaitingTime()[0]+"+/-"+this.getWaitingTime()[1];
 	}
 
 	public int getTokenCount() {
@@ -79,21 +84,34 @@ public class NaimiTrehelAlgoInfo extends NaimiTrehelAlgo {
 		return this.req_counter;
 	}
 
+	public int getReqInterCount() {
+		return this.req_inter_counter;
+	}
 	public static String getPerStateTimeInfo(long nb_cs_total, long tok_msg_total, long totalTime) {
 		Double[] info = NaimiTrehelAlgoInfo.getPerStateTime(nb_cs_total, tok_msg_total, totalTime);
 		return "U: " + info[0] + "%, " + "T: " + info[1] + "%, " + "N: " + info[2] + "%.";
 	}
 
-	public Long getWaitingTime() {
-		long totalTime = CommonState.getTime(); // je n'appelle cette méthode qu'à la fin, ainsi j'ai ici le vrai endtime
-		long betaPseudoTotal = (this.beta_starting.size()-1) * this.timeBetweenCS; // omettre le dernier beta au cas où il causerait un overflow apres la fin de la simu
-		long lastBetaStart = this.beta_starting.get(beta_starting.size()-1); // savoir si le beta peut s'ecouler d'ici la fin de la simu
-		if( (lastBetaStart + this.timeBetweenCS) > totalTime) // faudrait ajouter moins que beta
-			betaPseudoTotal += (totalTime - lastBetaStart);
-		else // egal ou inferieur: beta dans les deux cas
-			betaPseudoTotal += this.timeBetweenCS;
-		long alphaTotal = this.nb_cs * this.timeCS; // si la simu se termine alors qu'un noeud etait encore en CS, ce temps n'est inclus.
-		return totalTime - alphaTotal - betaPseudoTotal;
+	/*
+	 * [0]: average waiting time per cs
+	 * [1]: ecart type
+	 */
+	public double[] getWaitingTime() {
+		//List<Double> ecarts = new ArrayList<>();
+		List<Long> waiting_times = new ArrayList<>();
+		long total = 0;
+		double avg = 0.0, err = 0.0, total_ecart = 0.0;
+		for(int i=0; i<this.nb_cs; i++) {
+			waiting_times.add(cs_dates.get(i)-req_dates.get(i));
+			total += (cs_dates.get(i)-req_dates.get(i));
+		}
+		avg = ((double)total)/this.nb_cs;
+		for(long w:waiting_times) {
+			//ecarts.add((w-avg)*(w-avg));
+			total_ecart += (w-avg)*(w-avg);
+		}
+		err = Math.sqrt(total_ecart/nb_cs);
+		return new double[]{avg,err};
 	}
 
 	/*

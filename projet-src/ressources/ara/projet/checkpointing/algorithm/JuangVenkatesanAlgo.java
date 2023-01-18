@@ -225,8 +225,8 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 		while (nb_recv > rbmess.getNbSent()) {
 			delete_checkpoint();
 			should_continue_rollback = true;
-			log.fine("Node " + host.getID() + " : delete checkpoint because node " + rbmess.getIdSrc() + " has sent "
-					+ rbmess.getNbSent() + " messages to I but I receive " + nb_recv + " messages from "
+			log.info("Node " + host.getID() + " : delete checkpoint because node " + rbmess.getIdSrc() + " has sent "
+					+ rbmess.getNbSent() + " messages to me but I receive " + nb_recv + " messages from "
 					+ rbmess.getIdSrc());
 			log.fine("Node " + host.getID() + " : find last checkpoint (" + states.size() + " checkpoints)"
 					+ "  state = " + states.peek() + " sent = " + saved_sent.peek() + " rcvd = " + saved_rcvd.peek());

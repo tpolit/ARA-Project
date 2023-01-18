@@ -7,6 +7,7 @@ import java.util.Queue;
 
 import ara.projet.mutex.InternalEvent.TypeEvent;
 import ara.util.Message;
+import ara.util.NotPoisson;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Network;
@@ -250,7 +251,7 @@ public class NaimiTrehelAlgo implements EDProtocol {
 	}
 
 	private void schedule_release(Node host) {
-		long res = CommonState.r.nextPoisson(timeCS);
+		long res = NotPoisson.nextNotPoisson(timeCS);
 		EDSimulator.add(res,
 				new InternalEvent(TypeEvent.release_cs, id_execution), host,
 				protocol_id);
@@ -258,7 +259,7 @@ public class NaimiTrehelAlgo implements EDProtocol {
 	}
 
 	private void schedule_request(Node host) {
-		long res = CommonState.r.nextPoisson(timeBetweenCS);
+		long res = NotPoisson.nextNotPoisson(timeBetweenCS);
 		EDSimulator.add(res,
 				new InternalEvent(TypeEvent.request_cs, id_execution), host,
 				protocol_id);
