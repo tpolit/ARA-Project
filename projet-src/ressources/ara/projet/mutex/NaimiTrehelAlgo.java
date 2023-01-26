@@ -48,8 +48,6 @@ public class NaimiTrehelAlgo implements EDProtocol {
 	protected long last;
 	protected int nb_cs = 0;// permet de compter le nombre de section critiques
 							// exécutées par le noeud
-	protected int req_counter = 0;
-	protected int tok_counter = 0;
 	protected int global_counter = 0; // compteur qui sera inclu dans le message
 										// jeton, sa valeur est égale à la
 										// dernière valeur connue
@@ -163,7 +161,6 @@ public class NaimiTrehelAlgo implements EDProtocol {
 			Node dest = Network.get((int) last);
 			tr.send(host, dest, new RequestMessage(host.getID(), dest.getID(),
 					protocol_id, host.getID()), protocol_id);
-			this.req_counter++;
 			last = nil;
 			return;// on simule un wait ici
 		}
@@ -186,7 +183,6 @@ public class NaimiTrehelAlgo implements EDProtocol {
 					new TokenMessage(host.getID(), dest.getID(), protocol_id,
 							new ArrayDeque<Long>(next), global_counter),
 					protocol_id);
-			this.tok_counter++;
 			next.clear();
 		}
 	}
@@ -207,7 +203,6 @@ public class NaimiTrehelAlgo implements EDProtocol {
 				tr.send(host, dest, new TokenMessage(host.getID(), dest.getID(),
 						protocol_id, new ArrayDeque<Long>(), global_counter),
 						protocol_id);
-				this.tok_counter++;
 				last = requester;
 			}
 		} else {
@@ -266,11 +261,6 @@ public class NaimiTrehelAlgo implements EDProtocol {
 
 	}
 	
-	////////////////////////////////////////// TO MOVE TO A SUBCLASS ////////////////////////////////////////////////////
-	public String getInfoEnd() {
-		return "RequestMsg :"+this.req_counter+", TokenMsg:"+this.tok_counter;
-	}
-
 	////////////////////////////////////////// classe des messages
 	////////////////////////////////////////// /////////////////////////////////////
 

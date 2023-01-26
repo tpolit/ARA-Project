@@ -1,6 +1,4 @@
 #! /usr/bin/bash
-
-
 # Generate config.txt
 ### gamma and alpha are script arguments
 

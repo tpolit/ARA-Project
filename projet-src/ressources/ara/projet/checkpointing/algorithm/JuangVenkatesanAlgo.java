@@ -10,8 +10,10 @@ import java.util.Stack;
 
 import ara.projet.checkpointing.Checkpointable;
 import ara.projet.checkpointing.Checkpointer;
+import ara.projet.checkpointing.CrashObserver;
 import ara.projet.checkpointing.NodeState;
 import ara.util.Message;
+import ara.util.NotPoisson;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Fallible;
@@ -39,6 +41,8 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 	private static final String PAR_TRANSPORT = "transport";
 	private static final String PAR_CHECKPOINTABLE = "checkpointable";
 	private static final String PAR_TIMECHECKPOINTING = "timecheckpointing";
+	
+	
 
 	private final int checkpointable_id;
 	private final int transport;
@@ -109,6 +113,10 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 
 	@Override
 	public void processEvent(Node node, int pid, Object event) {
+		/*
+		 * Check condition for crash observer
+		 */
+		
 		if (protocol_id != pid) {
 			throw new RuntimeException("Receive an event for wrong protocol");
 		}
@@ -119,15 +127,21 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 			} else {
 				throw new RuntimeException("Receive unknown type event");
 			}
+		
 		} else if (event instanceof WrappingMessage) {
+			CrashObserver.msgAppCount++;
 			receiveWrappingMessage(node, (WrappingMessage) event);
 		} else if (event instanceof RollBackMessage) {
+			CrashObserver.msgCountPerCrash.put(CrashObserver.current_crash, CrashObserver.msgCountPerCrash.get(CrashObserver.current_crash)+1);
 			receiveRollBackMessage(node, (RollBackMessage) event);
 		} else if (event instanceof AckRollBackMessage) {
+			CrashObserver.msgCountPerCrash.put(CrashObserver.current_crash, CrashObserver.msgCountPerCrash.get(CrashObserver.current_crash)+1);
 			receiveAckRollBackMessage(node, (AckRollBackMessage) event);
 		} else if (event instanceof AskMissingMessMessage) {
+			CrashObserver.msgCountPerCrash.put(CrashObserver.current_crash, CrashObserver.msgCountPerCrash.get(CrashObserver.current_crash)+1);
 			receiveAskMissingMessMessage(node, (AskMissingMessMessage) event);
 		} else if (event instanceof ReplyAskMissingMessMessage) {
+			CrashObserver.msgCountPerCrash.put(CrashObserver.current_crash, CrashObserver.msgCountPerCrash.get(CrashObserver.current_crash)+1);
 			receiveReplyAskMissingMessMessage(node, (ReplyAskMissingMessMessage) event);
 		} else {
 			throw new RuntimeException("Receive unknown type event");
@@ -161,15 +175,25 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 
 	@Override
 	public void createCheckpoint(Node host) {
-
+		
 		Checkpointable chk = (Checkpointable) host.getProtocol(checkpointable_id);
 		NodeState ns = chk.getCurrentState();
 		states.push(ns);
-		saved_sent.push(new HashMap<>(sent));
-		saved_rcvd.push(new HashMap<>(rcvd));
+		saved_sent.push(new HashMap<>(sent)); // tjr meme size 10 noeuds * 4 octets + les attributes de la map 
+		saved_rcvd.push(new HashMap<>(rcvd)); // tjr meme size 10 noeuds * 4 octets + les attributes de la map
 		saved_sent_messages.push(new HashMap<>(sent_messages));
 		sent_messages.clear();
-
+		/*
+		//====================================ADDED CODE================================
+		// Calcul de la taille en utilisant la serialisation avec un bytearray
+		int sizeOfCounterMap = CrashObserver.objectToByte(saved_rcvd.peek()).length;
+		int length = CrashObserver.objectToByte(ns).length + CrashObserver.objectToByte(saved_sent_messages.peek()).length + 2*sizeOfCounterMap;
+		if(!CrashObserver.sizeOfCheckpointBeforeCrash.containsKey(CrashObserver.current_crash))
+			CrashObserver.sizeOfCheckpointBeforeCrash.put(CrashObserver.current_crash, length);
+		else
+			CrashObserver.sizeOfCheckpointBeforeCrash.put(CrashObserver.current_crash, length+CrashObserver.sizeOfCheckpointBeforeCrash.get(CrashObserver.current_crash));
+		//====================================ADDED CODE================================
+		*/
 		log.fine("Node " + host.getID() + " : saved  state (" + (states.size()) + ") " + states.peek() + " sent = "
 				+ saved_sent.peek() + " rcvd = " + saved_rcvd.peek() + " sent_messages = "
 				+ saved_sent_messages.peek());
@@ -181,7 +205,7 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 	@Override
 	public void recover(Node host) {
 		idround = 0;
-
+		
 		log.fine("Node " + host.getID() + " : start recovering");
 		Checkpointable chk = (Checkpointable) host.getProtocol(checkpointable_id);
 		chk.suspend();
@@ -191,6 +215,21 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 		} else {
 			host.setFailState(Fallible.OK);
 		}
+		//=============================ADDED CODE===============================
+		int sizeOfCounterMap = CrashObserver.objectToByte(saved_rcvd).length;
+		int length = CrashObserver.objectToByte(states).length + CrashObserver.objectToByte(saved_sent_messages).length + 2*sizeOfCounterMap;
+		
+		if(!CrashObserver.sizeOfCheckpointBeforeCrash.containsKey(CrashObserver.current_crash)) {
+			CrashObserver.sizeOfCheckpointBeforeCrash.put(CrashObserver.current_crash, length);
+			CrashObserver.sizeOfCheckpointStackBeforeCrash.put(CrashObserver.current_crash, states.size());
+		} else {
+			CrashObserver.sizeOfCheckpointBeforeCrash.put(CrashObserver.current_crash, length+CrashObserver.sizeOfCheckpointBeforeCrash.get(CrashObserver.current_crash));
+			CrashObserver.sizeOfCheckpointBeforeCrash.put(CrashObserver.current_crash, states.size()+CrashObserver.sizeOfCheckpointBeforeCrash.get(CrashObserver.current_crash));
+		}
+		
+		CrashObserver.initialCheckpointForNode.put(host.getID(), states.size());
+		CrashObserver.initialGlobalCounterForNode.put(host.getID(), (int) states.peek().loadVariable("global_counter"));
+		//======================================================================
 		log.info("Node " + host.getID() + " : start recovering (" + states.size() + " checkpoints) last state = "
 				+ states.peek());
 
@@ -222,12 +261,11 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 
 		nb_remaining_received_rollback--;
 		int nb_recv = saved_rcvd.peek().get(rbmess.getIdSrc());
-		while (nb_recv > rbmess.getNbSent()) {
+		while (nb_recv > rbmess.getNbSent()) { // si un seul noeud remarque une incoherence on doit verifier si ca marche avec les autres avec ce nouveau checkpoint
 			delete_checkpoint();
 			should_continue_rollback = true;
-			log.info("Node " + host.getID() + " : delete checkpoint because node " + rbmess.getIdSrc() + " has sent "
-					+ rbmess.getNbSent() + " messages to me but I receive " + nb_recv + " messages from "
-					+ rbmess.getIdSrc());
+			log.info("Node " + host.getID() + " : delete checkpoint because node " + rbmess.getIdSrc() + " has sent me"
+					+ rbmess.getNbSent() + " messages but I received only " + nb_recv + " messages");
 			log.fine("Node " + host.getID() + " : find last checkpoint (" + states.size() + " checkpoints)"
 					+ "  state = " + states.peek() + " sent = " + saved_sent.peek() + " rcvd = " + saved_rcvd.peek());
 			nb_recv = saved_rcvd.peek().get(rbmess.getIdSrc());
@@ -313,15 +351,15 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 			do {
 				List<WrappingMessage> l = this.saved_sent_messages.peek().get(amess.getIdSrc());
 				while (l == null) {
-					tmp.push(saved_sent_messages.pop());
+					tmp.push(saved_sent_messages.pop()); // revenir en arriere jusqu'a trouvé le checkpoint où y a des messages envoyés à ce noeud IdSrc
 					l = this.saved_sent_messages.peek().get(amess.getIdSrc());
 				}
-				int debut = Math.max(0, l.size() - nb_missing);
+				int debut = Math.max(0, l.size() - nb_missing); // pour ne renvoyer que les messages manquants. (Transport fifo)
 				for (int i = debut; i < l.size(); i++) {
 					missing_mess.add(l.get(i));
 					nb_missing--;
 				}
-			} while (nb_missing > 0);
+			} while (nb_missing > 0); // on refait une boucle puisque les messages manquants peuvent être dans different checkpoint.
 
 			while (!tmp.isEmpty()) {
 				saved_sent_messages.push(tmp.pop());
@@ -358,6 +396,15 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 		log.info("Node " + host.getID() + " : end recovering (recover from checkpoint " + states.size() + ")"
 				+ "  state = " + states.peek() + " nb reply messages = " + message_to_replay_after_recovery.size() + " "
 				+ message_to_replay_after_recovery);
+		//=============================ADDED CODE===============================
+		//System.out.println("Bye Bye! c'était le crash #"+CrashObserver.current_crash);
+		CrashObserver.lastCheckpointForNode.put(host.getID(), states.size());
+		CrashObserver.lastGlobalCounterForNode.put(host.getID(),(int) states.peek().loadVariable("global_counter"));
+		if(!CrashObserver.replayedMsgPerCrash.containsKey(CrashObserver.current_crash))
+			CrashObserver.replayedMsgPerCrash.put(CrashObserver.current_crash, message_to_replay_after_recovery.size());
+		else
+			CrashObserver.replayedMsgPerCrash.put(CrashObserver.current_crash, CrashObserver.replayedMsgPerCrash.get(CrashObserver.current_crash)+message_to_replay_after_recovery.size());
+		//======================================================================
 		chk.restoreState(states.peek());
 		for (WrappingMessage wm : message_to_replay_after_recovery) {
 			receiveWrappingMessage(host, wm);
@@ -390,6 +437,11 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 
 	public static class AskMissingMessMessage extends Message {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8486429615696487184L;
+
 		private final int nbrcv;
 
 		public int getNbRcv() {
@@ -405,6 +457,10 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 
 	public static class AckRollBackMessage extends Message {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7385602937810229506L;
 		private final boolean nack;
 
 		public AckRollBackMessage(long idsrc, long iddest, int pid, boolean nack) {
@@ -420,6 +476,10 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 
 	public static class ReplyAskMissingMessMessage extends Message {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3322571725278308166L;
 		private final List<WrappingMessage> missingmessages;
 
 		public ReplyAskMissingMessMessage(long idsrc, long iddest, int pid, List<WrappingMessage> missingmessages) {
@@ -436,6 +496,10 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 
 	public static class RollBackMessage extends Message {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2224148793669313451L;
 		private final int nbsent;
 
 		public int getNbSent() {
@@ -451,6 +515,10 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 
 	public static class WrappingMessage extends Message {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private final Message message;
 
 		public Message getMessage() {

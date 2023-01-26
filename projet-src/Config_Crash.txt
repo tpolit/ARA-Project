@@ -1,11 +1,11 @@
-network.size 5
+network.size 10
 simulation.experiment 1
-simulation.endtime 10000
+simulation.endtime 100000
 random.seed 874
 
 protocol.transport UniformRandomTransport
-protocol.transport.mindelay 5 # gamma
-protocol.transport.maxdelay 10
+protocol.transport.mindelay 8 # gamma
+protocol.transport.maxdelay 12
 
 protocol.fifotransport FIFOTransport
 protocol.fifotransport.transport transport
@@ -13,18 +13,24 @@ protocol.fifotransport.transport transport
 protocol.juang JuangVenkatesanAlgo
 protocol.juang.transport fifotransport
 protocol.juang.checkpointable naimitrehel
-protocol.juang.timecheckpointing 100
+protocol.juang.timecheckpointing 350
 
-protocol.naimitrehel NaimiTrehelAlgoCheckpointable
+protocol.naimitrehel CrashObserver
 protocol.naimitrehel.transport juang
-protocol.naimitrehel.timeCS 20 #alpha
-protocol.naimitrehel.timeBetweenCS 50 #beta
+protocol.naimitrehel.timeCS 100 #alpha
+protocol.naimitrehel.timeBetweenCS 2950 #beta
 
 init.i Initialisateur
 init.i.algo naimitrehel
 
 control.crash CrashControler
-control.crash.at 5000
-control.crash.faulty_nodes 4
-control.crash.probacrash 1
+control.crash.from 30000
+control.crash.step 1000
+control.crash.faulty_nodes 1_2_3_4_5_6_7_8_9_10
+control.crash.probacrash 0.2
 control.crash.checkpointer juang
+
+control.end TheEndCrashEdition
+control.end.at -1
+control.end.FINAL
+

@@ -24,6 +24,7 @@ public class TheEnd implements Control{
 	private File msgPerCsFile, reqCountFile, waitingTimeFile, statePercentagesFile;
 	private Writer msgPerCsWriter, reqCountWriter, waitingTimeWriter, statePercentagesWriter;
 	private boolean fileCreated = false; 
+	
 	private static final String PAR_ALGO = "algo";
 	private final int algoPid;
 	public TheEnd(String prefix) throws IOException {
@@ -129,7 +130,7 @@ public class TheEnd implements Control{
 		return false;
 	}
 	
-	public void addInfoToLine(File f, long beta, String info) throws IOException{
+	private void addInfoToLine(File f, long beta, String info) throws IOException{
 		BufferedReader filein = new BufferedReader(new FileReader(f));
 		StringBuffer inputBuffer = new StringBuffer();
 		String line;
