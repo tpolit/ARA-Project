@@ -61,9 +61,11 @@ sed -i "s/control.crash.step\s[0-9]\+/control.crash.step ${crashStep}/" $configF
 
 echo "Le simulateurs va s'exécuté avec des crash possible chez tous les noeuds, from=${crashStartingDate}, step=${crashStep}"
 echo "Les differentes exécutions vont prendre à chaque fois un delai entre les checkpoints de cette liste ${checkpointFreq[@]}"
+
+progress=0
 for seed in ${randomSeeds[@]}; do
 	sed -i "s/random.seed\s[0-9]\+/random.seed ${seed}/" $configFile
-	progress=0
+	
 	for freq in ${checkpointFreq[@]}; do
 
 		sed -i "s/protocol.juang.timecheckpointing\s[0-9]\+/protocol.juang.timecheckpointing ${freq}/" $configFile
@@ -71,7 +73,7 @@ for seed in ${randomSeeds[@]}; do
 			sed -i "s/protocol.naimitrehel.timeBetweenCS\s[0-9]\+/protocol.naimitrehel.timeBetweenCS $beta/" $configFile
 
 			# progress bar
-			echo_progressBar $progress $((${#betaValues[@]}*${#checkpointFreq[@]}))
+			echo_progressBar $progress $((${#betaValues[@]}*${#checkpointFreq[@]}*${#randomSeeds[@]}))
 			## launch sim: all outputs (even errors) are redirected to /dev/null
 			/usr/lib/jvm/java-11-openjdk-amd64/bin/java -Dfile.encoding=UTF-8 -classpath /home/mazigh/Software/PSAR/peersim-1.0.5/peersim-doclet.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/peersim-1.0.5.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/jep-2.3.0.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/djep-1.0.0.jar:/home/mazigh/Studies/M2_S1/ARA/Eclipse_Workspace/ARA-Project/projet-src/bin peersim.Simulator $configFile &>> ./output.log
 			progress=$((${progress} + 1)) # ((progress=progress+10))

@@ -1,6 +1,7 @@
 #! /usr/bin/bash
 # Generate config.txt
 ### gamma and alpha are script arguments
+source ./myLibrary.sh
 
 if [ $# -lt 3 ]; then
 	echo "Erreur dans le nombre d'arguments passés."
@@ -31,9 +32,10 @@ fi
 #Clean all previous data with the same alpha and gamma 
 if [ -f "./output/msgPerCs_${alpha}_${gamma}.csv" ]
 then
-	rm ./output/*_${alpha}_${gamma}.csv
+	gio trash ./output/*_${alpha}_${gamma}.csv
 fi
 
+gio trash ./output.log
 
 ## les differents fichiers
 configFile="$(dirname "${BASH_SOURCE[0]}")/Config.txt"
@@ -49,6 +51,7 @@ sed -i "s/protocol.naimitrehel.timeCS\s[0-9]\+/protocol.naimitrehel.timeCS ${alp
 echo "Le simulateurs va s'exécuté avec alpha=${alpha} et gamma=${gamma}"
 echo "Les differentes exécutions vont prendre à chaque fois un beta de cette liste ${betaValues[@]}"
 
+progress=0
 # printf "beta, msgPerCs\n">> ./output/msgPerCs_${alpha}_${gamma}.csv
 for seed in ${randomSeeds[@]}
 do
@@ -56,8 +59,11 @@ do
 
 	for beta in ${betaValues[@]}
 	do
+		echo_progressBar $progress $((${#betaValues[@]}*${#randomSeeds[@]}))
 		sed -i "s/protocol.naimitrehel.timeBetweenCS\s[0-9]\+/protocol.naimitrehel.timeBetweenCS $beta/" $configFile
 		## launch sim
 		/usr/lib/jvm/java-11-openjdk-amd64/bin/java -Dfile.encoding=UTF-8 -classpath /home/mazigh/Software/PSAR/peersim-1.0.5/peersim-doclet.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/peersim-1.0.5.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/jep-2.3.0.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/djep-1.0.0.jar:/home/mazigh/Studies/M2_S1/ARA/Eclipse_Workspace/ARA-Project/projet-src/bin peersim.Simulator $configFile &>> ./output.log
+	((progress=progress+1))
 	done
 done
+echo -e "\nDONE"

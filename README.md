@@ -2,12 +2,17 @@
 
 Réalisation d'une étude expérimentale d'algorithmes répartis grâce au simulateur PeerSim.
 
-- Lancez le script `launch_all.sh` dans le repertoire `projet-src` avec comme argument la durée de la simulation.
+## Execution
+
+- Faites bien attention à bien modifier la ligne `65` dans `launch_script.sh` et la ligne `78` dans `launch_script_crash.sh` avec une commande qui va lancer votre simulation java.
+- Lancez le script `launch_all.sh` dans le repertoire `projet-src` avec une durée de simulation définissable avec  l'option `-t`. Pour la simulation avec recouvrement utilisez le flag `-c`
     ```shell
     cd path_to_projet-src
-    bash ./launch_all.sh 100000
+    bash ./launch_all.sh -t 100000 # execution normal
+    bash ./launch_all.sh -c -t 100000 # execution avec recouvrement
     ```
-- Les données et figures des métriques seront sous le repértoire `projet-src/output/`.
+- Vous pourrez changer les differentes métriques en modifiant les scripts `launch_all.sh`, `launch_script.sh` et `launch_script_crash.sh`.
+- Les données et figures des métriques seront sous le repértoire `projet-src/output/` ou `projet-src/output/` en fonction du mode d'exécution choisi.
 
 ## Objectifs : 
 
