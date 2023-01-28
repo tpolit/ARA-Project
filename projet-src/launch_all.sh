@@ -17,6 +17,8 @@ Help() {
 ################################################################################################################
 #Main
 ################################################################################################################
+#import useful functions
+source ./myLibrary.sh
 
 crashEnabled=0
 executionTime=0
@@ -48,13 +50,15 @@ fi
 
 if [ $crashEnabled -eq 0 ]; then
 
+    title_in_center "Normal Edition"
+
     # getting data
     ./launch_script.sh 100 10 $executionTime
     ./launch_script.sh 55 55 $executionTime
     ./launch_script.sh 10 100 $executionTime
 
     # plotting
-    cd output
+    cd output/
     gnuplot 'waitingTime.gnu'
     gnuplot 'msgPerCs.gnu'
     gnuplot 'reqCount.gnu'
@@ -62,11 +66,9 @@ if [ $crashEnabled -eq 0 ]; then
 
 elif [ $crashEnabled -eq 1 ]; then
 
-    echo "###################################################################"
-    echo "                       ~~Crash Edition~~"
-    echo "###################################################################"
+    title_in_center "Crash Edition"
 
-    ./launch_script_crash.sh 30000 1000 $executionTime
+    ./launch_script_crash.sh 10000 15000 $executionTime
 
     cd output_crash/
     gnuplot "msgCount.plot" 
@@ -79,3 +81,5 @@ else
     echo "Something wrong happened! crashEnabled is different from 0 and 1!!!"
 
 fi
+
+repeat_char '#' $(tput cols)

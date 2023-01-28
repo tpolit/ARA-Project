@@ -33,7 +33,7 @@ public class CrashObserver extends NaimiTrehelAlgoCheckpointable{
 	
 	// Map(id_crash, size of all checkpoints of all nodes)
 	public static Map<Integer, Integer> sizeOfCheckpointBeforeCrash = new HashMap<>();
-	public static Map<Integer, Integer> sizeOfCheckpointStackBeforeCrash = new HashMap<>();
+	//public static Map<Integer, Integer> sizeOfCheckpointStackBeforeCrash = new HashMap<>();
 	
 	public static int current_crash = 0;
 	public static int node_recovered = 0;
@@ -73,7 +73,7 @@ public class CrashObserver extends NaimiTrehelAlgoCheckpointable{
 		if(node_recovered==Network.size()) {
 			// calculating average oldness of recovering point
 			int totalCheckpointDiff = 0, totalGlobalCounterDiff = 0;
-			//System.out.println(initialGlobalCounterForNode+"\n"+lastGlobalCounterForNode);
+			//System.out.println(initialGlobalCounterForNode+"\n"+lastGlobalCounterForNode+"\n");
 			for(long key:initialCheckpointForNode.keySet()) {
 				totalCheckpointDiff+=initialCheckpointForNode.get(key)-lastCheckpointForNode.get(key);
 				totalGlobalCounterDiff+=initialGlobalCounterForNode.get(key)-lastGlobalCounterForNode.get(key);

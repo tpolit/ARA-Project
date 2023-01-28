@@ -1,14 +1,7 @@
 #! /usr/bin/bash
 
-function repeat_char() {
-	local char=$1
-	local count=$2
-	local i=0
-	while [ $i -lt $count ]; do
-		echo -n "$char"
-		((i = i + 1))
-	done
-}
+#import useful functions
+source ./myLibrary.sh
 
 # Generate config.txt
 
@@ -23,15 +16,15 @@ fi
 #crashNode=$1
 crashStartingDate=$1
 crashStep=$2
-checkpointFreq=(50 150 250 350)
+checkpointFreq=(100 200 300 400)
 
 # legacy variables
-randomSeeds=(20 784 365 874)
+randomSeeds=(20 784 202 874)
 executionTime=$3
 
 betaValues=(50)
 i=1
-while [ $i -lt 30 ]; do
+while [ $i -lt 25 ]; do
 	betaValues[i]=$(($betaValues + $i * 100))
 	((i++))
 done
@@ -44,13 +37,14 @@ if [ $((crashStartingDate + crash)) -gt ${executionTime} ]; then
 fi
 
 for freq in ${checkpointFreq[@]}; do
-
 	#Clean all previous data
 	if [ -f "./output_crash/recoveryTime${freq}.csv" ]; then
 		echo "deleting files..."
 		gio trash ./output_crash/*${freq}.csv
 	fi
 done
+
+gio trash ./*.log
 
 ## les differents fichiers
 configFile="$(dirname "${BASH_SOURCE[0]}")/Config_Crash.txt"
@@ -77,14 +71,9 @@ for seed in ${randomSeeds[@]}; do
 			sed -i "s/protocol.naimitrehel.timeBetweenCS\s[0-9]\+/protocol.naimitrehel.timeBetweenCS $beta/" $configFile
 
 			# progress bar
-			left=$(((${#checkpointFreq[@]} * ${#betaValues[@]}) - progress))
-			progressBar=$(repeat_char = $progress)
-			leftBar=$(repeat_char ' ' $left)
-			percentage=$(((progress * 100) / (${#checkpointFreq[@]} * ${#betaValues[@]})))
-			echo -ne "[$progressBar>$leftBar]($percentage%)\r"
-
+			echo_progressBar $progress $((${#betaValues[@]}*${#checkpointFreq[@]}))
 			## launch sim: all outputs (even errors) are redirected to /dev/null
-			/usr/lib/jvm/java-11-openjdk-amd64/bin/java -Dfile.encoding=UTF-8 -classpath /home/mazigh/Software/PSAR/peersim-1.0.5/peersim-doclet.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/peersim-1.0.5.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/jep-2.3.0.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/djep-1.0.0.jar:/home/mazigh/Studies/M2_S1/ARA/Eclipse_Workspace/ARA-Project/projet-src/bin peersim.Simulator $configFile &>/dev/null
+			/usr/lib/jvm/java-11-openjdk-amd64/bin/java -Dfile.encoding=UTF-8 -classpath /home/mazigh/Software/PSAR/peersim-1.0.5/peersim-doclet.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/peersim-1.0.5.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/jep-2.3.0.jar:/home/mazigh/Software/PSAR/peersim-1.0.5/djep-1.0.0.jar:/home/mazigh/Studies/M2_S1/ARA/Eclipse_Workspace/ARA-Project/projet-src/bin peersim.Simulator $configFile &>> ./output.log
 			progress=$((${progress} + 1)) # ((progress=progress+10))
 		done
 	done

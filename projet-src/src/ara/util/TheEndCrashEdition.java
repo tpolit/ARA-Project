@@ -6,12 +6,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 
 import ara.projet.checkpointing.CrashObserver;
 import peersim.config.Configuration;
 import peersim.core.Control;
+import peersim.core.Network;
+import peersim.core.Node;
 
 public class TheEndCrashEdition implements Control{
 
@@ -42,9 +42,9 @@ public class TheEndCrashEdition implements Control{
 	@Override
 	public boolean execute()
 	{
-		Double avgRecoveryTime, avgMsgCount, avgAge, maxAge = 0.0, avgRollback, maxRollback = 0.0, avgCheckpointSize, avgReplayedMsg;
-		long totalRecoveryTime = 0, totalMsgCount = 0, totalAge = 0, totalRollback = 0, totalReplayedMsg = 0, maxReplayedMsg = 0;
-		List<Double> avgCheckpointSizeList = new ArrayList<>();
+		Double avgRecoveryTime, avgMsgCount, avgAge, maxAge = 0.0, avgRollback, maxRollback = 0.0, avgReplayedMsg, avgCheckpointSize ;
+		long totalRecoveryTime = 0, totalMsgCount = 0, totalAge = 0, totalRollback = 0, totalReplayedMsg = 0, maxReplayedMsg = 0, totalCheckpointSize = 0, maxCheckpointSize = 0;
+		//List<Double> avgCheckpointSizeList = new ArrayList<>();
 
 		//System.out.println("The END: Crash Nbr = "+CrashObserver.current_crash+ "\n\t-Starting dates: "+CrashObserver.startingCrashDates+"\n\t-Ending Dates: "+CrashObserver.endingCrashDates+"\n\t-Messages per Crash: "+CrashObserver.msgCountPerCrash+"\n\t-Size of checkpoints before crash: "+CrashObserver.sizeOfCheckpointBeforeCrash+"\n\t-Age per crash: "+CrashObserver.agePerCrash+"\n\t-Rollback per crash:"+CrashObserver.rollbackPerCrash+"\n\t-Replayed messages per crash: "+CrashObserver.replayedMsgPerCrash);
 
@@ -54,31 +54,42 @@ public class TheEndCrashEdition implements Control{
 			totalAge+=CrashObserver.agePerCrash.get(key);
 			totalRollback+=CrashObserver.rollbackPerCrash.get(key);
 			totalReplayedMsg+=CrashObserver.replayedMsgPerCrash.get(key);
-			avgCheckpointSizeList.add(((double)CrashObserver.sizeOfCheckpointBeforeCrash.get(key))/CrashObserver.sizeOfCheckpointStackBeforeCrash.get(key));
+			totalCheckpointSize+=CrashObserver.sizeOfCheckpointBeforeCrash.get(key);
+			//avgCheckpointSizeList.add(((double)CrashObserver.sizeOfCheckpointBeforeCrash.get(key))/CrashObserver.sizeOfCheckpointStackBeforeCrash.get(key));
 			if(maxAge < CrashObserver.agePerCrash.get(key))
 				maxAge = CrashObserver.agePerCrash.get(key);
 			if(maxRollback < CrashObserver.rollbackPerCrash.get(key))
 				maxRollback = CrashObserver.rollbackPerCrash.get(key);
 			if(maxReplayedMsg < CrashObserver.replayedMsgPerCrash.get(key))
 				maxReplayedMsg = CrashObserver.replayedMsgPerCrash.get(key);
+			if(maxCheckpointSize < CrashObserver.sizeOfCheckpointBeforeCrash.get(key))
+				maxCheckpointSize = CrashObserver.sizeOfCheckpointBeforeCrash.get(key);
 
 		}
+		
+		/*calculating size of all checkpoints
+		for(int i=0; i<Network.getCapacity(); i++) {
+			Node node = Network.get(i);
+			JuangVenkatesanAlgo algo = (JuangVenkatesanAlgo)node.getProtocol(algoPid);
+			
+		}*/
 
 		avgRecoveryTime = ((double)totalRecoveryTime)/(CrashObserver.current_crash);
 		avgMsgCount = ((double)totalMsgCount)/(CrashObserver.current_crash);
 		avgAge = ((double)totalAge)/(CrashObserver.current_crash);
 		avgRollback = ((double)totalRollback)/(CrashObserver.current_crash);
 		avgReplayedMsg = ((double)totalReplayedMsg)/(CrashObserver.current_crash);
-		avgCheckpointSize = avgCheckpointSizeList.stream().mapToDouble(a->a).average().getAsDouble();
-		/*
+		avgCheckpointSize = ((double)totalCheckpointSize)/(CrashObserver.current_crash);
+		
 		System.out.println("Average recovery time = "+avgRecoveryTime);
 		System.out.println("Average message count = "+avgMsgCount);
 		System.out.println("Average replayed message per crash = "+avgReplayedMsg);
 		System.out.println("Average oldness(Global Counter) = "+avgAge+" -- Max oldness = "+maxAge);
 		System.out.println("Average rollbacks = "+avgRollback+" -- Max rollbacks = "+maxRollback);
 		System.out.println("Final chekpoints size = "+CrashObserver.sizeOfCheckpointBeforeCrash.get(CrashObserver.current_crash-1)+" bytes");
-		System.out.println("Average checkpoint size per crash: "+avgCheckpointSizeList+"\n\t-Average = "+avgCheckpointSize);
-		 */
+		System.out.println("Average checkpoint size per crash: "+avgCheckpointSize+" -- Max = "+maxCheckpointSize);
+		
+		
 		try {
 			if(Configuration.getLong("random.seed") == 20) {
 				// beta, msgAppCount, metrique

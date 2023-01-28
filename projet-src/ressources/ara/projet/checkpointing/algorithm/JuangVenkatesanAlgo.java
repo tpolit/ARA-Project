@@ -179,8 +179,8 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 		Checkpointable chk = (Checkpointable) host.getProtocol(checkpointable_id);
 		NodeState ns = chk.getCurrentState();
 		states.push(ns);
-		saved_sent.push(new HashMap<>(sent)); // tjr meme size 10 noeuds * 4 octets + les attributes de la map 
-		saved_rcvd.push(new HashMap<>(rcvd)); // tjr meme size 10 noeuds * 4 octets + les attributes de la map
+		saved_sent.push(new HashMap<>(sent)); // tjr meme size 10 noeuds * 4 octets * size + les attributes de la map 
+		saved_rcvd.push(new HashMap<>(rcvd)); // tjr meme size 10 noeuds * 4 octets * size + les attributes de la map
 		saved_sent_messages.push(new HashMap<>(sent_messages));
 		sent_messages.clear();
 		/*
@@ -216,17 +216,18 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 			host.setFailState(Fallible.OK);
 		}
 		//=============================ADDED CODE===============================
-		int sizeOfCounterMap = CrashObserver.objectToByte(saved_rcvd).length;
-		int length = CrashObserver.objectToByte(states).length + CrashObserver.objectToByte(saved_sent_messages).length + 2*sizeOfCounterMap;
+		int sizeOfCounterMap = CrashObserver.objectToByte(saved_rcvd).length + CrashObserver.objectToByte(saved_sent).length;
+		int length = CrashObserver.objectToByte(states).length + CrashObserver.objectToByte(saved_sent_messages).length + sizeOfCounterMap;
+		//System.out.println("\nChekpoint nbr : "+saved_sent_messages.size()+" Key count in a sentMessages: "+ saved_sent_messages.peek().keySet().size());
+		//System.out.println("States: "+CrashObserver.objectToByte(states).length+ " Msg Sent: "+CrashObserver.objectToByte(saved_sent_messages).length+" Count Rcv: "+CrashObserver.objectToByte(saved_rcvd).length+" Count sent: "+CrashObserver.objectToByte(saved_sent).length);
 		
 		if(!CrashObserver.sizeOfCheckpointBeforeCrash.containsKey(CrashObserver.current_crash)) {
 			CrashObserver.sizeOfCheckpointBeforeCrash.put(CrashObserver.current_crash, length);
-			CrashObserver.sizeOfCheckpointStackBeforeCrash.put(CrashObserver.current_crash, states.size());
+			//CrashObserver.sizeOfCheckpointStackBeforeCrash.put(CrashObserver.current_crash, states.size());
 		} else {
 			CrashObserver.sizeOfCheckpointBeforeCrash.put(CrashObserver.current_crash, length+CrashObserver.sizeOfCheckpointBeforeCrash.get(CrashObserver.current_crash));
-			CrashObserver.sizeOfCheckpointBeforeCrash.put(CrashObserver.current_crash, states.size()+CrashObserver.sizeOfCheckpointBeforeCrash.get(CrashObserver.current_crash));
+			//CrashObserver.sizeOfCheckpointBeforeCrash.put(CrashObserver.current_crash, states.size()+CrashObserver.sizeOfCheckpointBeforeCrash.get(CrashObserver.current_crash));
 		}
-		
 		CrashObserver.initialCheckpointForNode.put(host.getID(), states.size());
 		CrashObserver.initialGlobalCounterForNode.put(host.getID(), (int) states.peek().loadVariable("global_counter"));
 		//======================================================================
@@ -411,6 +412,13 @@ public class JuangVenkatesanAlgo implements Checkpointer, EDProtocol, Transport 
 		}
 
 	}
+	
+	//=====================================================================
+	// ADDED METHOD
+	public int getStatesSize() {
+		return CrashObserver.objectToByte(this.states).length;
+	}
+	//=====================================================================
 
 	////////////////////////////////////////// Fin des methodes de recouvrement
 

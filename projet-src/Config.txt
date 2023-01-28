@@ -1,16 +1,16 @@
 network.size 10
 simulation.experiment 1
 simulation.endtime 100000
-random.seed 874
+random.seed 784
 
 protocol.transport UniformRandomTransport
-protocol.transport.mindelay 100 # gamma
-protocol.transport.maxdelay 110
+protocol.transport.mindelay 10 # gamma
+protocol.transport.maxdelay 11
 
 protocol.naimitrehel NaimiTrehelAlgoInfo
 protocol.naimitrehel.transport transport
-protocol.naimitrehel.timeCS 10 #alpha
-protocol.naimitrehel.timeBetweenCS 2950 #beta
+protocol.naimitrehel.timeCS 100 #alpha
+protocol.naimitrehel.timeBetweenCS 250 #beta
 
 init.i Initialisateur
 init.i.algo naimitrehel
